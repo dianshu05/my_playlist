@@ -23,7 +23,7 @@ const songs = [
   {
     title: "Dracula",
     artist: "Tame Impala",
-    id: ""xnP7qKxwzjg"",
+    id: "xnP7qKxwzjg",
     duration: "3:54",
     genre: "Indie Rock",
     cover: "https://i.ytimg.com/vi/v56M2j0S-I0/hqdefault.jpg"
