@@ -20,14 +20,14 @@ const songs = [
     genre: "Indie Pop",
     cover: "https://i.ytimg.com/vi/sBzrzS1Ag_g/hqdefault.jpg"
   },
-  {
-    title: "Dracula",
-    artist: "Tame Impala",
-    id: "xnP7qKxwzjg",
-    duration: "3:54",
-    genre: "Indie Rock",
-    cover: "https://i.ytimg.com/vi/v56M2j0S-I0/hqdefault.jpg"
-  },
+ {
+  title: "Dracula",
+  artist: "Tame Impala",
+  id: "xnP7qKxwzjg",
+  duration: "3:54",
+  genre: "Indie Rock",
+  cover: "https://i.ytimg.com/vi/xnP7qKxwzjg/hqdefault.jpg"
+},
   {
     title: "Loser",
     artist: "Tame Impala",
