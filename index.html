@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Midnight Radio 🎧</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+</head>
+
+<body>
+
+    <div class="background-glow glow-one"></div>
+    <div class="background-glow glow-two"></div>
+
+    <main class="app">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                <div class="logo-icon">♫</div>
+                <div>
+                    <strong>Midnight</strong>
+                    <span>Radio</span>
+                </div>
+            </div>
+
+            <nav>
+                <button class="nav-item active">
+                    <span>⌂</span>
+                    Home
+                </button>
+
+                <button class="nav-item" onclick="focusSearch()">
+                    <span>⌕</span>
+                    Search
+                </button>
+
+                <button class="nav-item" onclick="showFavorites()">
+                    <span>♡</span>
+                    Favorites
+                </button>
+            </nav>
+
+            <div class="sidebar-section">
+                <div class="section-label">YOUR MOOD</div>
+
+                <button class="mood-btn" onclick="filterMood('all')">
+                    ✦ All Music
+                </button>
+
+                <button class="mood-btn" onclick="filterMood('lofi')">
+                    ☁ Lofi
+                </button>
+
+                <button class="mood-btn" onclick="filterMood('indie')">
+                    ◉ Indie
+                </button>
+
+                <button class="mood-btn" onclick="filterMood('late')">
+                    ☾ Late Night
+                </button>
+            </div>
+
+            <div class="sidebar-bottom">
+                <div class="mini-note">
+                    <span>☾</span>
+                    <div>
+                        <b>Late night mode</b>
+                        <small>Perfect for studying</small>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+        <section class="content">
+
+            <header class="topbar">
+
+                <button class="mobile-menu" onclick="toggleSidebar()">
+                    ☰
+                </button>
+
+                <div class="search-box">
+                    <span>⌕</span>
+                    <input
+                        id="searchInput"
+                        type="text"
+                        placeholder="Search songs, artists..."
+                        oninput="searchSongs()"
+                    >
+                </div>
+
+                <button class="theme-btn" onclick="toggleTheme()" title="Change theme">
+                    ◐
+                </button>
+
+            </header>
+
+
+            <!-- HERO -->
+            <section class="hero">
+
+                <div class="hero-text">
+
+                    <div class="eyebrow">
+                        <span class="pulse"></span>
+                        PLAYING AFTER DARK
+                    </div>
+
+                    <h1>
+                        Your midnight<br>
+                        <span>soundtrack.</span>
+                    </h1>
+
+                    <p>
+                        Lofi beats, dreamy indie and everything
+                        that sounds better after midnight.
+                    </p>
+
+                    <button class="hero-play" onclick="playFirst()">
+                        <span>▶</span>
+                        Start listening
+                    </button>
+
+                </div>
+
+                <div class="hero-art">
+                    <div class="moon"></div>
+
+                    <div class="stars">
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                    </div>
+
+                    <div class="mountain mountain-back"></div>
+                    <div class="mountain mountain-front"></div>
+
+                    <div class="hero-character">
+                        ♫
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- CURRENT PLAYER -->
+            <section class="player-card">
+
+                <div class="player-video">
+                    <div id="youtube-player"></div>
+                </div>
+
+                <div class="player-info">
+
+                    <div class="now-playing">
+                        <span>NOW PLAYING</span>
+                        <div id="playingTitle">Select a song</div>
+                        <small id="playingArtist">Nothing playing</small>
+                    </div>
+
+                    <div class="player-controls">
+
+                        <button onclick="previousSong()" title="Previous">
+                            ↶
+                        </button>
+
+                        <button
+                            class="main-play"
+                            id="playButton"
+                            onclick="togglePlay()"
+                            title="Play"
+                        >
+                            ▶
+                        </button>
+
+                        <button onclick="nextSong()" title="Next">
+                            ↷
+                        </button>
+
+                    </div>
+
+                    <button
+                        class="heart-btn"
+                        id="currentFavorite"
+                        onclick="toggleCurrentFavorite()"
+                    >
+                        ♡
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- SONG LIST -->
+            <section class="music-section">
+
+                <div class="section-heading">
+                    <div>
+                        <span class="small-heading">YOUR MIX</span>
+                        <h2>Tonight's selection</h2>
+                    </div>
+
+                    <button class="shuffle-btn" onclick="shufflePlaylist()">
+                        ⤨ Shuffle
+                    </button>
+                </div>
+
+
+                <div id="songList" class="song-list"></div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+    <!-- BOTTOM MOBILE PLAYER -->
+    <div class="mobile-player">
+
+        <div class="mobile-song">
+            <div class="mobile-cover" id="mobileCover">♫</div>
+
+            <div>
+                <strong id="mobileTitle">Nothing playing</strong>
+                <small id="mobileArtist">Choose a song</small>
+            </div>
+        </div>
+
+        <button onclick="togglePlay()" id="mobilePlay">
+            ▶
+        </button>
+
+        <button onclick="nextSong()">
+            ↷
+        </button>
+
+    </div>
+
+
+    <!-- YOUTUBE API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
