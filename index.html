@@ -2,145 +2,405 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Midnight Radio — your late night music soundtrack."
+    >
+
+    <meta
+        name="theme-color"
+        content="#080812"
+    >
 
     <title>Midnight Radio 🎧</title>
 
-    <link rel="stylesheet" href="style.css">
+
+    <!-- =====================================================
+         FONTS
+    ====================================================== -->
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
         rel="stylesheet"
     >
+
+
+    <!-- =====================================================
+         STYLESHEET
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
+
 
 <body>
 
-    <div class="background-glow glow-one"></div>
-    <div class="background-glow glow-two"></div>
+
+    <!-- =====================================================
+         BACKGROUND
+    ====================================================== -->
+
+    <div
+        class="background-glow glow-one"
+        aria-hidden="true"
+    ></div>
+
+    <div
+        class="background-glow glow-two"
+        aria-hidden="true"
+    ></div>
+
+
+    <!-- =====================================================
+         APP
+    ====================================================== -->
 
     <main class="app">
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
+
+        <!-- =================================================
+             SIDEBAR
+        ================================================== -->
+
+        <aside class="sidebar" id="sidebar">
+
+
+            <!-- LOGO -->
 
             <div class="logo">
-                <div class="logo-icon">♫</div>
-                <div>
-                    <strong>Midnight</strong>
-                    <span>Radio</span>
+
+                <div
+                    class="logo-icon"
+                    aria-hidden="true"
+                >
+                    ♫
                 </div>
+
+                <div class="logo-text">
+
+                    <strong>Midnight</strong>
+
+                    <span>Radio</span>
+
+                </div>
+
             </div>
 
-            <nav>
-                <button class="nav-item active">
-                    <span>⌂</span>
-                    Home
+
+            <!-- NAVIGATION -->
+
+            <nav
+                class="main-nav"
+                aria-label="Main navigation"
+            >
+
+                <button
+                    type="button"
+                    class="nav-item active"
+                    onclick="filterMood('all')"
+                >
+
+                    <span aria-hidden="true">⌂</span>
+
+                    <span>Home</span>
+
                 </button>
 
-                <button class="nav-item" onclick="focusSearch()">
-                    <span>⌕</span>
-                    Search
+
+                <button
+                    type="button"
+                    class="nav-item"
+                    onclick="focusSearch()"
+                >
+
+                    <span aria-hidden="true">⌕</span>
+
+                    <span>Search</span>
+
                 </button>
 
-                <button class="nav-item" onclick="showFavorites()">
-                    <span>♡</span>
-                    Favorites
+
+                <button
+                    type="button"
+                    class="nav-item"
+                    onclick="showFavorites()"
+                >
+
+                    <span aria-hidden="true">♡</span>
+
+                    <span>Favorites</span>
+
                 </button>
+
             </nav>
 
-            <div class="sidebar-section">
-                <div class="section-label">YOUR MOOD</div>
 
-                <button class="mood-btn" onclick="filterMood('all')">
+            <!-- MOODS -->
+
+            <div class="sidebar-section">
+
+                <div class="section-label">
+                    YOUR MOOD
+                </div>
+
+
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('all')"
+                >
                     ✦ All Music
                 </button>
 
-                <button class="mood-btn" onclick="filterMood('lofi')">
-                    ☁ Lofi
-                </button>
 
-                <button class="mood-btn" onclick="filterMood('indie')">
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('indie')"
+                >
                     ◉ Indie
                 </button>
 
-                <button class="mood-btn" onclick="filterMood('late')">
-                    ☾ Late Night
+
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('pop')"
+                >
+                    ✦ Pop
                 </button>
+
+
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('rock')"
+                >
+                    ◉ Rock
+                </button>
+
+
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('r&b')"
+                >
+                    ♫ R&B
+                </button>
+
+
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('hip hop')"
+                >
+                    ◆ Hip Hop
+                </button>
+
+
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('electro')"
+                >
+                    ◇ Electronic
+                </button>
+
             </div>
 
+
+            <!-- SIDEBAR FOOTER -->
+
             <div class="sidebar-bottom">
+
                 <div class="mini-note">
-                    <span>☾</span>
+
+                    <span aria-hidden="true">
+                        ☾
+                    </span>
+
                     <div>
-                        <b>Late night mode</b>
-                        <small>Perfect for studying</small>
+
+                        <b>
+                            Late night mode
+                        </b>
+
+                        <small>
+                            Perfect for studying
+                        </small>
+
                     </div>
+
                 </div>
+
             </div>
 
         </aside>
 
 
-        <!-- MAIN CONTENT -->
+
+        <!-- =================================================
+             MAIN CONTENT
+        ================================================== -->
+
         <section class="content">
+
+
+            <!-- =================================================
+                 TOP BAR
+            ================================================== -->
 
             <header class="topbar">
 
-                <button class="mobile-menu" onclick="toggleSidebar()">
+
+                <!-- MOBILE MENU -->
+
+                <button
+                    type="button"
+                    class="mobile-menu"
+                    onclick="toggleSidebar()"
+                    aria-label="Open menu"
+                >
                     ☰
                 </button>
 
+
+                <!-- SEARCH -->
+
                 <div class="search-box">
-                    <span>⌕</span>
+
+                    <span
+                        aria-hidden="true"
+                        class="search-icon"
+                    >
+                        ⌕
+                    </span>
+
                     <input
                         id="searchInput"
-                        type="text"
+                        type="search"
                         placeholder="Search songs, artists..."
+                        autocomplete="off"
                         oninput="searchSongs()"
+                        aria-label="Search songs and artists"
                     >
+
+                    <button
+                        type="button"
+                        class="clear-search"
+                        onclick="
+                            document.getElementById('searchInput').value='';
+                            searchSongs();
+                        "
+                        aria-label="Clear search"
+                    >
+                        ×
+                    </button>
+
                 </div>
 
-                <button class="theme-btn" onclick="toggleTheme()" title="Change theme">
+
+                <!-- THEME -->
+
+                <button
+                    type="button"
+                    class="theme-btn"
+                    onclick="toggleTheme()"
+                    title="Change theme"
+                    aria-label="Change theme"
+                >
                     ◐
                 </button>
 
             </header>
 
 
-            <!-- HERO -->
-            <section class="hero">
+
+            <!-- =================================================
+                 HERO
+            ================================================== -->
+
+            <section
+                class="hero"
+                aria-label="Midnight Radio introduction"
+            >
+
 
                 <div class="hero-text">
 
+
                     <div class="eyebrow">
-                        <span class="pulse"></span>
+
+                        <span
+                            class="pulse"
+                            aria-hidden="true"
+                        ></span>
+
                         PLAYING AFTER DARK
+
                     </div>
+
 
                     <h1>
                         Your midnight<br>
                         <span>soundtrack.</span>
                     </h1>
 
+
                     <p>
                         Lofi beats, dreamy indie and everything
                         that sounds better after midnight.
                     </p>
 
-                    <button class="hero-play" onclick="playFirst()">
-                        <span>▶</span>
+
+                    <button
+                        type="button"
+                        class="hero-play"
+                        onclick="playFirst()"
+                    >
+
+                        <span aria-hidden="true">
+                            ▶
+                        </span>
+
                         Start listening
+
                     </button>
 
                 </div>
 
-                <div class="hero-art">
+
+
+                <!-- HERO ART -->
+
+                <div
+                    class="hero-art"
+                    aria-hidden="true"
+                >
+
                     <div class="moon"></div>
 
+
                     <div class="stars">
+
                         <i></i>
                         <i></i>
                         <i></i>
@@ -148,59 +408,146 @@
                         <i></i>
                         <i></i>
                         <i></i>
+
                     </div>
 
-                    <div class="mountain mountain-back"></div>
-                    <div class="mountain mountain-front"></div>
+
+                    <div
+                        class="mountain mountain-back"
+                    ></div>
+
+
+                    <div
+                        class="mountain mountain-front"
+                    ></div>
+
 
                     <div class="hero-character">
                         ♫
                     </div>
+
                 </div>
 
             </section>
 
 
-            <!-- CURRENT PLAYER -->
-            <section class="player-card">
+
+            <!-- =================================================
+                 CURRENT PLAYER
+            ================================================== -->
+
+            <section
+                class="player-card"
+                aria-label="Music player"
+            >
+
+
+                <!-- YOUTUBE PLAYER -->
 
                 <div class="player-video">
-                    <div id="youtube-player"></div>
+
+                    <div
+                        id="youtube-player"
+                        class="youtube-player"
+                    >
+
+                        <!--
+                            YouTube IFrame Player API
+                            will replace this container.
+                        -->
+
+                        <div
+                            class="youtube-placeholder"
+                        >
+
+                            <span>♫</span>
+
+                            <p>
+                                Select a song to start listening
+                            </p>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
+
+
+                <!-- PLAYER INFORMATION -->
 
                 <div class="player-info">
 
+
                     <div class="now-playing">
-                        <span>NOW PLAYING</span>
-                        <div id="playingTitle">Select a song</div>
-                        <small id="playingArtist">Nothing playing</small>
+
+                        <span>
+                            NOW PLAYING
+                        </span>
+
+
+                        <div id="playingTitle">
+                            Select a song
+                        </div>
+
+
+                        <small id="playingArtist">
+                            Nothing playing
+                        </small>
+
                     </div>
+
+
+
+                    <!-- CONTROLS -->
 
                     <div class="player-controls">
 
-                        <button onclick="previousSong()" title="Previous">
+
+                        <button
+                            type="button"
+                            onclick="previousSong()"
+                            title="Previous song"
+                            aria-label="Previous song"
+                        >
                             ↶
                         </button>
 
+
                         <button
+                            type="button"
                             class="main-play"
                             id="playButton"
                             onclick="togglePlay()"
                             title="Play"
+                            aria-label="Play or pause"
                         >
                             ▶
                         </button>
 
-                        <button onclick="nextSong()" title="Next">
+
+                        <button
+                            type="button"
+                            onclick="nextSong()"
+                            title="Next song"
+                            aria-label="Next song"
+                        >
                             ↷
                         </button>
 
                     </div>
 
+
+
+                    <!-- FAVORITE -->
+
                     <button
+                        type="button"
                         class="heart-btn"
                         id="currentFavorite"
                         onclick="toggleCurrentFavorite()"
+                        title="Add to favorites"
+                        aria-label="Add current song to favorites"
                     >
                         ♡
                     </button>
@@ -210,57 +557,146 @@
             </section>
 
 
-            <!-- SONG LIST -->
-            <section class="music-section">
+
+            <!-- =================================================
+                 SONG LIST
+            ================================================== -->
+
+            <section
+                class="music-section"
+                aria-label="Playlist"
+            >
+
 
                 <div class="section-heading">
+
+
                     <div>
-                        <span class="small-heading">YOUR MIX</span>
-                        <h2>Tonight's selection</h2>
+
+                        <span class="small-heading">
+                            YOUR MIX
+                        </span>
+
+                        <h2>
+                            Tonight's selection
+                        </h2>
+
                     </div>
 
-                    <button class="shuffle-btn" onclick="shufflePlaylist()">
-                        ⤨ Shuffle
+
+                    <button
+                        type="button"
+                        class="shuffle-btn"
+                        onclick="shufflePlaylist()"
+                    >
+
+                        ⤨
+
+                        <span>
+                            Shuffle
+                        </span>
+
                     </button>
+
                 </div>
 
 
-                <div id="songList" class="song-list"></div>
+                <!--
+                    JavaScript will automatically insert
+                    all songs here.
+                -->
+
+                <div
+                    id="songList"
+                    class="song-list"
+                ></div>
+
 
             </section>
+
 
         </section>
 
     </main>
 
 
-    <!-- BOTTOM MOBILE PLAYER -->
-    <div class="mobile-player">
+
+    <!-- =====================================================
+         MOBILE PLAYER
+    ====================================================== -->
+
+    <div
+        class="mobile-player"
+        id="mobilePlayer"
+    >
+
 
         <div class="mobile-song">
-            <div class="mobile-cover" id="mobileCover">♫</div>
 
-            <div>
-                <strong id="mobileTitle">Nothing playing</strong>
-                <small id="mobileArtist">Choose a song</small>
+
+            <div
+                class="mobile-cover"
+                id="mobileCover"
+            >
+                ♫
             </div>
+
+
+            <div class="mobile-song-info">
+
+                <strong id="mobileTitle">
+                    Nothing playing
+                </strong>
+
+                <small id="mobileArtist">
+                    Choose a song
+                </small>
+
+            </div>
+
         </div>
 
-        <button onclick="togglePlay()" id="mobilePlay">
+
+        <button
+            type="button"
+            onclick="togglePlay()"
+            id="mobilePlay"
+            aria-label="Play or pause"
+        >
             ▶
         </button>
 
-        <button onclick="nextSong()">
+
+        <button
+            type="button"
+            onclick="nextSong()"
+            aria-label="Next song"
+        >
             ↷
         </button>
 
     </div>
 
 
-    <!-- YOUTUBE API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <!-- =====================================================
+         YOUTUBE IFRAME API
+         
+         IMPORTANT:
+         Keep this BEFORE script.js.
+    ====================================================== -->
+
+    <script
+        src="https://www.youtube.com/iframe_api"
+    ></script>
+
+
+    <!-- =====================================================
+         YOUR JAVASCRIPT
+    ====================================================== -->
 
     <script src="script.js"></script>
 
+
 </body>
-</html>
+</html> 
