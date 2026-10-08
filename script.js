@@ -1,11 +1,13 @@
+::writing{variant="document" id="58321" title="Improved Midnight Radio script.js"}
+
 /* =========================================================
    MIDNIGHT RADIO
-   YouTube Music Player
+   Improved YouTube Music Player
 ========================================================= */
 
 
 /* =========================================================
-   YOUR PLAYLIST
+   PLAYLIST
 ========================================================= */
 
 const songs = [
@@ -422,270 +424,396 @@ const songs = [
    PLAYER STATE
 ========================================================= */
 
-let currentIndex = 0;
+const STORAGE = {
+  favorites: "midnightFavorites",
+  theme: "midnightTheme",
+  currentSong: "midnightCurrentSong",
+  volume: "midnightVolume",
+  repeat: "midnightRepeat",
+  recentlyPlayed: "midnightRecentlyPlayed"
+};
+
 let player = null;
 let isReady = false;
 
-let filteredSongs = [...songs];
+let currentIndex = 0;
+let currentQueue = [...songs];
+let queueIndex = 0;
+
+let isLoadingSong = false;
+let userHasInteracted = false;
+
+let repeatMode =
+  localStorage.getItem(STORAGE.repeat) || "off";
+
+let volume =
+  Number(localStorage.getItem(STORAGE.volume));
+
+if (!Number.isFinite(volume)) {
+  volume = 80;
+}
 
 let favorites =
-  JSON.parse(
-    localStorage.getItem("midnightFavorites")
-  ) || [];
+  readStorage(STORAGE.favorites, []);
+
+let recentlyPlayed =
+  readStorage(STORAGE.recentlyPlayed, []);
+
+let failedSongs =
+  new Set();
 
 
 /* =========================================================
-   YOUTUBE IFRAME API
+   STORAGE HELPERS
+========================================================= */
+
+function readStorage(key, fallback) {
+
+  try {
+
+    const value =
+      localStorage.getItem(key);
+
+    if (!value) {
+      return fallback;
+    }
+
+    return JSON.parse(value);
+
+  } catch (error) {
+
+    console.warn(
+      `Could not read localStorage key: ${key}`,
+      error
+    );
+
+    return fallback;
+
+  }
+
+}
+
+
+function writeStorage(key, value) {
+
+  try {
+
+    localStorage.setItem(
+      key,
+      JSON.stringify(value)
+    );
+
+  } catch (error) {
+
+    console.warn(
+      `Could not save localStorage key: ${key}`,
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CURRENT SONG
+========================================================= */
+
+function getCurrentSong() {
+
+  return songs[currentIndex] || null;
+
+}
+
+
+function getSongKey(song) {
+
+  if (!song) return "";
+
+  return song.id || song.title;
+
+}
+
+
+/* =========================================================
+   YOUTUBE API
 ========================================================= */
 
 function onYouTubeIframeAPIReady() {
 
   console.log("YouTube API loaded.");
 
-  const playerElement =
+  const container =
     document.getElementById("youtube-player");
 
-  if (!playerElement) {
+  if (!container) {
 
     console.error(
-      'Missing element: <div id="youtube-player"></div>'
+      "Missing #youtube-player element."
     );
 
     return;
+
   }
 
-  player = new YT.Player("youtube-player", {
+  player =
+    new YT.Player(
+      "youtube-player",
+      {
 
-    width: "100%",
-    height: "100%",
+        width: "100%",
+        height: "100%",
 
-    videoId: songs[0].id,
+        videoId: getCurrentSong()?.id || "",
 
-    playerVars: {
-      autoplay: 0,
-      controls: 1,
-      rel: 0,
-      playsinline: 1
-    },
+        playerVars: {
 
-    events: {
+          autoplay: 0,
+          controls: 1,
+          rel: 0,
+          playsinline: 1,
+          modestbranding: 1
 
-      onReady: function (event) {
+        },
 
-        console.log("YouTube player ready.");
+        events: {
 
-        isReady = true;
+          onReady: handlePlayerReady,
 
-        updateInterface();
+          onStateChange:
+            handlePlayerStateChange,
 
-      },
+          onError:
+            handlePlayerError,
 
-      onStateChange: function (event) {
-
-        console.log(
-          "YouTube state:",
-          event.data
-        );
-
-        if (
-          event.data ===
-          YT.PlayerState.ENDED
-        ) {
-
-          nextSong();
+          onAutoplayBlocked:
+            handleAutoplayBlocked
 
         }
 
-        updatePlayButton();
-
-      },
-
-      onError: function (event) {
-
-        const errors = {
-
-          2:
-            "Invalid YouTube video ID.",
-
-          5:
-            "HTML5 player error.",
-
-          100:
-            "Video not found, removed, or private.",
-
-          101:
-            "The video owner does not allow embedding.",
-
-          150:
-            "The video owner does not allow embedding.",
-
-          153:
-            "Missing HTTP Referer or API client identification."
-
-        };
-
-        console.error(
-          "YouTube player error:",
-          event.data
-        );
-
-        console.error(
-          errors[event.data] ||
-          "Unknown YouTube player error."
-        );
-
-      },
-
-      onAutoplayBlocked: function () {
-
-        console.warn(
-          "YouTube blocked autoplay. User interaction is required."
-        );
-
       }
-
-    }
-
-  });
+    );
 
 }
 
 
 /* =========================================================
-   RENDER PLAYLIST
+   PLAYER READY
 ========================================================= */
 
-function renderSongs(list = filteredSongs) {
+function handlePlayerReady(event) {
 
-  const container =
-    document.getElementById("songList");
+  console.log("YouTube player ready.");
 
-  if (!container) return;
+  isReady = true;
 
-  container.innerHTML = "";
+  player.setVolume(volume);
+
+  updateInterface();
+
+  updatePlayButton();
+
+  updateMediaSession();
+
+  restoreSavedSong();
+
+}
 
 
-  if (!list.length) {
+/* =========================================================
+   RESTORE LAST SONG
+========================================================= */
 
-    container.innerHTML = `
-      <div style="
-        padding:40px;
-        text-align:center;
-        color:#777;
-      ">
-        No songs found.
-      </div>
-    `;
+function restoreSavedSong() {
 
-    return;
+  const savedId =
+    localStorage.getItem(
+      STORAGE.currentSong
+    );
+
+  if (!savedId) return;
+
+  const savedIndex =
+    songs.findIndex(
+      song => song.id === savedId
+    );
+
+  if (savedIndex === -1) return;
+
+  currentIndex = savedIndex;
+
+  const position =
+    songs.findIndex(
+      song => song.id === savedId
+    );
+
+  if (position >= 0) {
+    queueIndex = position;
+  }
+
+  updateInterface();
+
+}
+
+
+/* =========================================================
+   PLAYER STATE
+========================================================= */
+
+function handlePlayerStateChange(event) {
+
+  updatePlayButton();
+
+  if (
+    event.data ===
+    YT.PlayerState.PLAYING
+  ) {
+
+    isLoadingSong = false;
+
+    setPlayerStatus("Playing");
+
+    updateMediaSession();
 
   }
 
 
-  list.forEach((song, index) => {
+  if (
+    event.data ===
+    YT.PlayerState.PAUSED
+  ) {
 
-    const realIndex =
-      songs.indexOf(song);
+    setPlayerStatus("Paused");
 
-    const key =
-      song.id || song.title;
+    if (
+      "mediaSession" in navigator
+    ) {
 
-    const isFavorite =
-      favorites.includes(key);
+      try {
+        navigator.mediaSession.playbackState =
+          "paused";
+      } catch (_) {}
 
-    const isPlaying =
-      realIndex === currentIndex;
+    }
 
-
-    const div =
-      document.createElement("div");
-
-
-    div.className =
-      `song ${isPlaying ? "playing" : ""}`;
+  }
 
 
-    div.innerHTML = `
+  if (
+    event.data ===
+    YT.PlayerState.BUFFERING
+  ) {
 
-      <div class="song-number">
-        ${
-          isPlaying
-            ? "♪"
-            : String(index + 1).padStart(2, "0")
-        }
-      </div>
+    setPlayerStatus("Buffering…");
 
-      <div class="cover">
-
-        <img
-          src="${song.cover}"
-          alt="${escapeHTML(song.title)}"
-          loading="lazy"
-        >
-
-      </div>
-
-      <div class="song-info">
-
-        <div class="song-title">
-          ${escapeHTML(song.title)}
-        </div>
-
-        <div class="song-artist">
-          ${escapeHTML(song.artist)}
-        </div>
-
-      </div>
-
-      <div class="song-duration">
-        ${song.duration}
-      </div>
-
-      <button
-        class="song-favorite ${
-          isFavorite ? "favorite" : ""
-        }"
-        data-index="${realIndex}"
-        type="button"
-        aria-label="Favorite ${escapeHTML(song.title)}"
-      >
-        ${isFavorite ? "♥" : "♡"}
-      </button>
-
-    `;
+  }
 
 
-    div.addEventListener(
-      "click",
-      function () {
+  if (
+    event.data ===
+    YT.PlayerState.ENDED
+  ) {
 
-        playSong(realIndex);
+    handleSongEnded();
 
-      }
+  }
+
+}
+
+
+/* =========================================================
+   PLAYER ERROR
+========================================================= */
+
+function handlePlayerError(event) {
+
+  const errorCode =
+    event.data;
+
+  const errors = {
+
+    2:
+      "Invalid YouTube video ID.",
+
+    5:
+      "YouTube HTML5 player error.",
+
+    100:
+      "This video is unavailable.",
+
+    101:
+      "This video cannot be embedded.",
+
+    150:
+      "This video cannot be embedded.",
+
+    153:
+      "YouTube could not identify the embed request."
+
+  };
+
+
+  const message =
+    errors[errorCode] ||
+    "This song could not be played.";
+
+
+  console.error(
+    "YouTube error:",
+    errorCode,
+    message
+  );
+
+
+  const song =
+    getCurrentSong();
+
+
+  if (song) {
+
+    failedSongs.add(
+      getSongKey(song)
     );
 
-
-    const favoriteButton =
-      div.querySelector(
-        ".song-favorite"
-      );
+  }
 
 
-    favoriteButton.addEventListener(
-      "click",
-      function (event) {
+  setPlayerStatus("Unavailable");
 
-        event.stopPropagation();
-
-        toggleFavorite(realIndex);
-
-      }
-    );
+  showToast(
+    `${song?.title || "Song"} — ${message}`
+  );
 
 
-    container.appendChild(div);
+  /*
+   * Automatically attempt another song.
+   */
 
-  });
+  setTimeout(
+    () => {
+
+      playNextAvailable();
+
+    },
+    700
+  );
+
+}
+
+
+/* =========================================================
+   AUTOPLAY BLOCKED
+========================================================= */
+
+function handleAutoplayBlocked() {
+
+  console.warn(
+    "Autoplay was blocked by the browser."
+  );
+
+  showToast(
+    "Press play to start listening."
+  );
 
 }
 
@@ -694,7 +822,13 @@ function renderSongs(list = filteredSongs) {
    PLAY SONG
 ========================================================= */
 
-function playSong(index) {
+function playSong(index, options = {}) {
+
+  const {
+    fromQueue = false,
+    userAction = true
+  } = options;
+
 
   if (
     index < 0 ||
@@ -708,25 +842,61 @@ function playSong(index) {
 
   currentIndex = index;
 
+  userHasInteracted =
+    userHasInteracted || userAction;
+
+
+  if (!fromQueue) {
+
+    const queuePosition =
+      currentQueue.findIndex(
+        song =>
+          getSongKey(song) ===
+          getSongKey(songs[index])
+      );
+
+    if (queuePosition >= 0) {
+      queueIndex = queuePosition;
+    }
+
+  }
+
+
   const song =
-    songs[currentIndex];
+    getCurrentSong();
 
 
-  console.log(
-    "Playing:",
-    song.title,
-    "| YouTube ID:",
-    song.id
-  );
+  if (!song) return;
 
+
+  if (
+    failedSongs.has(
+      getSongKey(song)
+    )
+  ) {
+
+    playNextAvailable();
+
+    return;
+
+  }
+
+
+  saveCurrentSong();
+
+  addRecentlyPlayed(song);
 
   updateInterface();
+
+  updateMediaSession();
+
+  setPlayerStatus("Loading…");
 
 
   if (!player || !isReady) {
 
-    console.warn(
-      "YouTube player is not ready yet."
+    showToast(
+      "Player is still loading…"
     );
 
     return;
@@ -734,13 +904,27 @@ function playSong(index) {
   }
 
 
-  /*
-   * loadVideoById() loads AND plays the video.
-   */
+  isLoadingSong = true;
 
-  player.loadVideoById(
-    song.id
-  );
+
+  try {
+
+    player.loadVideoById(
+      song.id
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Could not load song:",
+      error
+    );
+
+    handlePlayerError({
+      data: 100
+    });
+
+  }
 
 }
 
@@ -751,21 +935,51 @@ function playSong(index) {
 
 function playFirst() {
 
-  playSong(0);
+  if (!currentQueue.length) {
+
+    currentQueue =
+      [...songs];
+
+    queueIndex = 0;
+
+  }
+
+
+  const firstSong =
+    currentQueue[0];
+
+  const index =
+    songs.indexOf(firstSong);
+
+
+  if (index >= 0) {
+
+    playSong(
+      index,
+      {
+        fromQueue: true,
+        userAction: true
+      }
+    );
+
+  }
 
 }
 
 
 /* =========================================================
-   PLAY / PAUSE
+   TOGGLE PLAY
 ========================================================= */
 
 function togglePlay() {
 
+  userHasInteracted = true;
+
+
   if (!player || !isReady) {
 
-    console.warn(
-      "Player is not ready."
+    showToast(
+      "Player is still loading…"
     );
 
     return;
@@ -784,59 +998,42 @@ function togglePlay() {
 
     player.pauseVideo();
 
-  } else {
-
-    player.playVideo();
+    return;
 
   }
 
-}
 
+  /*
+   * If nothing meaningful has loaded,
+   * start the current song.
+   */
 
-/* =========================================================
-   UPDATE PLAY BUTTON
-========================================================= */
-
-function updatePlayButton() {
-
-  if (!player || !isReady) return;
-
-
-  const state =
-    player.getPlayerState();
-
-
-  const playing =
+  if (
     state ===
-    YT.PlayerState.PLAYING;
+      YT.PlayerState.UNSTARTED ||
+    state ===
+      YT.PlayerState.CUED ||
+    state ===
+      -1
+  ) {
 
+    const song =
+      getCurrentSong();
 
-  const button =
-    document.getElementById(
-      "playButton"
-    );
+    if (song) {
 
+      player.loadVideoById(
+        song.id
+      );
 
-  const mobile =
-    document.getElementById(
-      "mobilePlay"
-    );
+    }
 
-
-  if (button) {
-
-    button.textContent =
-      playing ? "Ⅱ" : "▶";
-
-  }
-
-
-  if (mobile) {
-
-    mobile.textContent =
-      playing ? "Ⅱ" : "▶";
+    return;
 
   }
+
+
+  player.playVideo();
 
 }
 
@@ -847,18 +1044,56 @@ function updatePlayButton() {
 
 function nextSong() {
 
-  currentIndex++;
+  if (!currentQueue.length) {
 
-  if (
-    currentIndex >= songs.length
-  ) {
-
-    currentIndex = 0;
+    currentQueue =
+      [...songs];
 
   }
 
 
-  playSong(currentIndex);
+  if (
+    repeatMode === "one"
+  ) {
+
+    replayCurrent();
+
+    return;
+
+  }
+
+
+  queueIndex++;
+
+
+  if (
+    queueIndex >=
+    currentQueue.length
+  ) {
+
+    if (
+      repeatMode === "all"
+    ) {
+
+      queueIndex = 0;
+
+    } else {
+
+      queueIndex =
+        currentQueue.length - 1;
+
+      showToast(
+        "You've reached the end of the queue."
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  playQueueIndex();
 
 }
 
@@ -869,31 +1104,979 @@ function nextSong() {
 
 function previousSong() {
 
-  currentIndex--;
+  if (!currentQueue.length) {
+    return;
+  }
+
+
+  /*
+   * If the song is more than 3 seconds in,
+   * restart it instead of going backwards.
+   */
 
   if (
-    currentIndex < 0
+    player &&
+    isReady &&
+    typeof player.getCurrentTime ===
+      "function"
   ) {
 
-    currentIndex =
-      songs.length - 1;
+    const time =
+      player.getCurrentTime();
+
+    if (time > 3) {
+
+      player.seekTo(
+        0,
+        true
+      );
+
+      return;
+
+    }
 
   }
 
 
-  playSong(currentIndex);
+  queueIndex--;
+
+
+  if (queueIndex < 0) {
+
+    if (
+      repeatMode === "all"
+    ) {
+
+      queueIndex =
+        currentQueue.length - 1;
+
+    } else {
+
+      queueIndex = 0;
+
+      showToast(
+        "Already at the first song."
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  playQueueIndex();
 
 }
 
 
 /* =========================================================
-   UPDATE NOW PLAYING
+   PLAY QUEUE INDEX
+========================================================= */
+
+function playQueueIndex() {
+
+  if (
+    queueIndex < 0 ||
+    queueIndex >= currentQueue.length
+  ) {
+
+    return;
+
+  }
+
+
+  const song =
+    currentQueue[queueIndex];
+
+
+  const index =
+    songs.indexOf(song);
+
+
+  if (index === -1) {
+    return;
+  }
+
+
+  playSong(
+    index,
+    {
+      fromQueue: true,
+      userAction: true
+    }
+  );
+
+}
+
+
+/* =========================================================
+   PLAY NEXT AVAILABLE
+========================================================= */
+
+function playNextAvailable() {
+
+  if (!currentQueue.length) {
+
+    showToast(
+      "No songs available."
+    );
+
+    return;
+
+  }
+
+
+  let attempts = 0;
+
+
+  while (
+    attempts <
+    currentQueue.length
+  ) {
+
+    queueIndex++;
+
+
+    if (
+      queueIndex >=
+      currentQueue.length
+    ) {
+
+      queueIndex = 0;
+
+    }
+
+
+    const candidate =
+      currentQueue[queueIndex];
+
+
+    const key =
+      getSongKey(candidate);
+
+
+    if (
+      !failedSongs.has(key)
+    ) {
+
+      const index =
+        songs.indexOf(candidate);
+
+
+      if (index >= 0) {
+
+        playSong(
+          index,
+          {
+            fromQueue: true,
+            userAction: true
+          }
+        );
+
+        return;
+
+      }
+
+    }
+
+
+    attempts++;
+
+  }
+
+
+  showToast(
+    "No playable songs were found in this queue."
+  );
+
+}
+
+
+/* =========================================================
+   SONG ENDED
+========================================================= */
+
+function handleSongEnded() {
+
+  if (
+    repeatMode === "one"
+  ) {
+
+    replayCurrent();
+
+    return;
+
+  }
+
+
+  nextSong();
+
+}
+
+
+/* =========================================================
+   REPLAY
+========================================================= */
+
+function replayCurrent() {
+
+  if (!player || !isReady) {
+    return;
+  }
+
+
+  player.seekTo(
+    0,
+    true
+  );
+
+  player.playVideo();
+
+}
+
+
+/* =========================================================
+   PLAYLIST RENDERING
+========================================================= */
+
+function renderSongs(list = currentQueue) {
+
+  const container =
+    document.getElementById(
+      "songList"
+    );
+
+  if (!container) return;
+
+
+  container.innerHTML = "";
+
+
+  if (!list.length) {
+
+    container.innerHTML = `
+      <div class="empty-state">
+        <div style="
+          padding:40px;
+          text-align:center;
+          color:#777;
+        ">
+          No songs found.
+        <br>
+        <small>
+          Try another search or mood.
+        </small>
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  list.forEach(
+    (song, index) => {
+
+      const realIndex =
+        songs.indexOf(song);
+
+
+      if (realIndex < 0) {
+        return;
+      }
+
+
+      const key =
+        getSongKey(song);
+
+
+      const favorite =
+        favorites.includes(key);
+
+
+      const playing =
+        realIndex === currentIndex;
+
+
+      const div =
+        document.createElement("div");
+
+
+      div.className =
+        `song ${
+          playing
+            ? "playing"
+            : ""
+        }`;
+
+
+      div.innerHTML = `
+
+        <div class="song-number">
+          ${
+            playing
+              ? "♪"
+              : String(index + 1)
+                  .padStart(2, "0")
+          }
+        </div>
+
+        <div class="cover">
+
+          <img
+            src="${escapeHTML(song.cover)}"
+            alt="${escapeHTML(song.title)}"
+            loading="lazy"
+          >
+
+        </div>
+
+        <div class="song-info">
+
+          <div class="song-title">
+            ${escapeHTML(song.title)}
+          </div>
+
+          <div class="song-artist">
+            ${escapeHTML(song.artist)}
+          </div>
+
+        </div>
+
+        <div class="song-duration">
+          ${escapeHTML(song.duration)}
+        </div>
+
+        <button
+          class="song-favorite ${
+            favorite
+              ? "favorite"
+              : ""
+          }"
+          type="button"
+          aria-label="${
+            favorite
+              ? "Remove from favorites"
+              : "Add to favorites"
+          }"
+        >
+          ${
+            favorite
+              ? "♥"
+              : "♡"
+          }
+        </button>
+
+      `;
+
+
+      div.addEventListener(
+        "click",
+        () => {
+
+          queueIndex =
+            index;
+
+          playSong(
+            realIndex,
+            {
+              fromQueue: true,
+              userAction: true
+            }
+          );
+
+        }
+      );
+
+
+      const favoriteButton =
+        div.querySelector(
+          ".song-favorite"
+        );
+
+
+      favoriteButton.addEventListener(
+        "click",
+        event => {
+
+          event.stopPropagation();
+
+          toggleFavorite(
+            realIndex
+          );
+
+        }
+      );
+
+
+      container.appendChild(div);
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   FAVORITES
+========================================================= */
+
+function toggleFavorite(index) {
+
+  const song =
+    songs[index];
+
+  if (!song) return;
+
+
+  const key =
+    getSongKey(song);
+
+
+  if (
+    favorites.includes(key)
+  ) {
+
+    favorites =
+      favorites.filter(
+        item =>
+          item !== key
+      );
+
+  } else {
+
+    favorites.push(key);
+
+  }
+
+
+  writeStorage(
+    STORAGE.favorites,
+    favorites
+  );
+
+
+  updateCurrentFavorite();
+
+  renderSongs(currentQueue);
+
+}
+
+
+/* =========================================================
+   CURRENT FAVORITE
+========================================================= */
+
+function toggleCurrentFavorite() {
+
+  toggleFavorite(
+    currentIndex
+  );
+
+}
+
+
+function updateCurrentFavorite() {
+
+  const button =
+    document.getElementById(
+      "currentFavorite"
+    );
+
+  if (!button) return;
+
+
+  const song =
+    getCurrentSong();
+
+  if (!song) return;
+
+
+  const favorite =
+    favorites.includes(
+      getSongKey(song)
+    );
+
+
+  button.textContent =
+    favorite
+      ? "♥"
+      : "♡";
+
+
+  button.classList.toggle(
+    "favorite",
+    favorite
+  );
+
+
+  button.setAttribute(
+    "aria-label",
+    favorite
+      ? "Remove from favorites"
+      : "Add current song to favorites"
+  );
+
+}
+
+
+/* =========================================================
+   SHOW FAVORITES
+========================================================= */
+
+function showFavorites() {
+
+  currentQueue =
+    songs.filter(
+      song =>
+        favorites.includes(
+          getSongKey(song)
+        )
+    );
+
+
+  queueIndex =
+    Math.max(
+      0,
+      currentQueue.findIndex(
+        song =>
+          getSongKey(song) ===
+          getSongKey(
+            getCurrentSong()
+          )
+      )
+    );
+
+
+  renderSongs(
+    currentQueue
+  );
+
+
+  setActiveNav(
+    "favorites"
+  );
+
+
+  closeSidebar();
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+function searchSongs() {
+
+  const input =
+    document.getElementById(
+      "searchInput"
+    );
+
+  if (!input) return;
+
+
+  const query =
+    input.value
+      .toLowerCase()
+      .trim();
+
+
+  if (!query) {
+
+    currentQueue =
+      [...songs];
+
+  } else {
+
+    currentQueue =
+      songs.filter(
+        song => {
+
+          const title =
+            song.title
+              .toLowerCase();
+
+          const artist =
+            song.artist
+              .toLowerCase();
+
+          const genre =
+            song.genre
+              .toLowerCase();
+
+
+          return (
+            title.includes(query) ||
+            artist.includes(query) ||
+            genre.includes(query)
+          );
+
+        }
+      );
+
+  }
+
+
+  syncQueueIndex();
+
+  renderSongs(
+    currentQueue
+  );
+
+
+  setActiveNav(
+    "search"
+  );
+
+}
+
+
+/* =========================================================
+   MOOD FILTER
+========================================================= */
+
+function filterMood(mood) {
+
+  const normalized =
+    String(mood || "")
+      .toLowerCase()
+      .trim();
+
+
+  if (
+    !normalized ||
+    normalized === "all"
+  ) {
+
+    currentQueue =
+      [...songs];
+
+    setActiveNav(
+      "home"
+    );
+
+  } else {
+
+    currentQueue =
+      songs.filter(
+        song =>
+          song.genre
+            .toLowerCase()
+            .includes(normalized)
+      );
+
+  }
+
+
+  syncQueueIndex();
+
+  renderSongs(
+    currentQueue
+  );
+
+
+  closeSidebar();
+
+}
+
+
+/* =========================================================
+   SHUFFLE
+========================================================= */
+
+function shufflePlaylist() {
+
+  if (
+    currentQueue.length < 2
+  ) {
+
+    showToast(
+      "Not enough songs to shuffle."
+    );
+
+    return;
+
+  }
+
+
+  const currentSong =
+    getCurrentSong();
+
+
+  const shuffled =
+    [...currentQueue];
+
+
+  for (
+    let i =
+      shuffled.length - 1;
+    i > 0;
+    i--
+  ) {
+
+    const j =
+      Math.floor(
+        Math.random() *
+        (i + 1)
+      );
+
+
+    [
+      shuffled[i],
+      shuffled[j]
+    ] =
+    [
+      shuffled[j],
+      shuffled[i]
+    ];
+
+  }
+
+
+  /*
+   * Keep currently playing song
+   * near the beginning of the queue.
+   */
+
+  if (currentSong) {
+
+    const currentPosition =
+      shuffled.findIndex(
+        song =>
+          getSongKey(song) ===
+          getSongKey(currentSong)
+      );
+
+
+    if (currentPosition > 0) {
+
+      [
+        shuffled[0],
+        shuffled[currentPosition]
+      ] =
+      [
+        shuffled[currentPosition],
+        shuffled[0]
+      ];
+
+    }
+
+  }
+
+
+  currentQueue =
+    shuffled;
+
+
+  syncQueueIndex();
+
+  renderSongs(
+    currentQueue
+  );
+
+
+  if (currentQueue.length) {
+
+    queueIndex =
+      Math.min(
+        queueIndex,
+        currentQueue.length - 1
+      );
+
+  }
+
+
+  showToast(
+    "Queue shuffled."
+  );
+
+}
+
+
+/* =========================================================
+   REPEAT
+========================================================= */
+
+function toggleRepeat() {
+
+  const modes =
+    ["off", "all", "one"];
+
+
+  const current =
+    modes.indexOf(
+      repeatMode
+    );
+
+
+  repeatMode =
+    modes[
+      (current + 1) %
+      modes.length
+    ];
+
+
+  localStorage.setItem(
+    STORAGE.repeat,
+    repeatMode
+  );
+
+
+  updateRepeatButton();
+
+  showToast(
+    `Repeat: ${
+      repeatMode === "off"
+        ? "Off"
+        : repeatMode === "all"
+          ? "All"
+          : "One"
+    }`
+  );
+
+}
+
+
+function updateRepeatButton() {
+
+  const button =
+    document.getElementById(
+      "repeatButton"
+    );
+
+  if (!button) return;
+
+
+  button.classList.toggle(
+    "active",
+    repeatMode !== "off"
+  );
+
+
+  button.textContent =
+    repeatMode === "one"
+      ? "🔂"
+      : "🔁";
+
+
+  button.title =
+    `Repeat: ${
+      repeatMode === "off"
+        ? "Off"
+        : repeatMode === "all"
+          ? "All"
+          : "One"
+    }`;
+
+}
+
+
+/* =========================================================
+   QUEUE SYNC
+========================================================= */
+
+function syncQueueIndex() {
+
+  const currentSong =
+    getCurrentSong();
+
+
+  if (!currentSong) {
+
+    queueIndex = 0;
+
+    return;
+
+  }
+
+
+  const found =
+    currentQueue.findIndex(
+      song =>
+        getSongKey(song) ===
+        getSongKey(currentSong)
+    );
+
+
+  queueIndex =
+    found >= 0
+      ? found
+      : 0;
+
+}
+
+
+/* =========================================================
+   RECENTLY PLAYED
+========================================================= */
+
+function addRecentlyPlayed(song) {
+
+  if (!song) return;
+
+
+  const key =
+    getSongKey(song);
+
+
+  recentlyPlayed =
+    recentlyPlayed.filter(
+      item => item !== key
+    );
+
+
+  recentlyPlayed.unshift(
+    key
+  );
+
+
+  recentlyPlayed =
+    recentlyPlayed.slice(
+      0,
+      20
+    );
+
+
+  writeStorage(
+    STORAGE.recentlyPlayed,
+    recentlyPlayed
+  );
+
+}
+
+
+/* =========================================================
+   SAVE CURRENT SONG
+========================================================= */
+
+function saveCurrentSong() {
+
+  const song =
+    getCurrentSong();
+
+
+  if (!song) return;
+
+
+  localStorage.setItem(
+    STORAGE.currentSong,
+    song.id
+  );
+
+}
+
+
+/* =========================================================
+   INTERFACE
 ========================================================= */
 
 function updateInterface() {
 
   const song =
-    songs[currentIndex];
+    getCurrentSong();
 
 
   if (!song) return;
@@ -924,322 +2107,541 @@ function updateInterface() {
 
 
   if (title) {
-
     title.textContent =
       song.title;
-
   }
 
 
   if (artist) {
-
     artist.textContent =
       song.artist;
-
   }
 
 
   if (mobileTitle) {
-
     mobileTitle.textContent =
       song.title;
-
   }
 
 
   if (mobileArtist) {
-
     mobileArtist.textContent =
       song.artist;
-
   }
 
 
-  const mobileCover =
+  updateMobileCover();
+
+  updateCurrentFavorite();
+
+  updatePlayButton();
+
+  renderSongs(
+    currentQueue
+  );
+
+}
+
+
+/* =========================================================
+   MOBILE COVER
+========================================================= */
+
+function updateMobileCover() {
+
+  const container =
     document.getElementById(
       "mobileCover"
     );
 
 
-  if (mobileCover) {
+  const song =
+    getCurrentSong();
 
-    mobileCover.innerHTML = `
-      <img
-        src="${song.cover}"
-        alt="${escapeHTML(song.title)}"
-        style="
-          width:100%;
-          height:100%;
-          object-fit:cover;
-          border-radius:8px;
-        "
-      >
-    `;
 
+  if (!container || !song) {
+    return;
   }
 
 
-  updateCurrentFavorite();
+  container.innerHTML = `
 
-  renderSongs(filteredSongs);
+    <img
+      src="${escapeHTML(song.cover)}"
+      alt="${escapeHTML(song.title)}"
+      style="
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        border-radius:8px;
+      "
+    >
+
+  `;
 
 }
 
 
 /* =========================================================
-   CURRENT FAVORITE
+   PLAY BUTTON
 ========================================================= */
 
-function updateCurrentFavorite() {
+function updatePlayButton() {
 
   const button =
     document.getElementById(
-      "currentFavorite"
+      "playButton"
     );
 
 
-  if (!button) return;
+  const mobile =
+    document.getElementById(
+      "mobilePlay"
+    );
 
 
-  const song =
-    songs[currentIndex];
+  let playing =
+    false;
 
 
-  if (!song) return;
+  if (
+    player &&
+    isReady &&
+    typeof player.getPlayerState ===
+      "function"
+  ) {
+
+    playing =
+      player.getPlayerState() ===
+      YT.PlayerState.PLAYING;
+
+  }
 
 
-  const key =
-    song.id || song.title;
+  if (button) {
+
+    button.textContent =
+      playing
+        ? "Ⅱ"
+        : "▶";
+
+    button.title =
+      playing
+        ? "Pause"
+        : "Play";
+
+  }
 
 
-  const favorite =
-    favorites.includes(key);
+  if (mobile) {
+
+    mobile.textContent =
+      playing
+        ? "Ⅱ"
+        : "▶";
+
+  }
+
+}
 
 
-  button.textContent =
-    favorite ? "♥" : "♡";
+/* =========================================================
+   PLAYER STATUS
+========================================================= */
+
+function setPlayerStatus(status) {
+
+  const indicator =
+    document.querySelector(
+      ".now-playing > span"
+    );
 
 
-  button.classList.toggle(
-    "favorite",
-    favorite
+  if (!indicator) return;
+
+
+  indicator.textContent =
+    status === "Playing"
+      ? "NOW PLAYING"
+      : status.toUpperCase();
+
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+function updateProgress() {
+
+  if (
+    !player ||
+    !isReady ||
+    typeof player.getCurrentTime !==
+      "function"
+  ) {
+
+    return;
+
+  }
+
+
+  const current =
+    player.getCurrentTime() || 0;
+
+
+  const duration =
+    player.getDuration() || 0;
+
+
+  const percentage =
+    duration > 0
+      ? (current / duration) * 100
+      : 0;
+
+
+  const progress =
+    document.getElementById(
+      "progressBar"
+    );
+
+
+  const currentTime =
+    document.getElementById(
+      "currentTime"
+    );
+
+
+  const durationElement =
+    document.getElementById(
+      "totalTime"
+    );
+
+
+  if (progress) {
+
+    progress.value =
+      percentage;
+
+  }
+
+
+  if (currentTime) {
+
+    currentTime.textContent =
+      formatTime(current);
+
+  }
+
+
+  if (durationElement) {
+
+    durationElement.textContent =
+      formatTime(duration);
+
+  }
+
+}
+
+
+/* =========================================================
+   SEEK
+========================================================= */
+
+function seekSong(value) {
+
+  if (
+    !player ||
+    !isReady
+  ) {
+
+    return;
+
+  }
+
+
+  const duration =
+    player.getDuration();
+
+
+  if (!duration) {
+    return;
+  }
+
+
+  const time =
+    duration *
+    (Number(value) / 100);
+
+
+  player.seekTo(
+    time,
+    true
   );
 
 }
 
 
 /* =========================================================
-   FAVORITES
+   VOLUME
 ========================================================= */
 
-function toggleFavorite(index) {
+function setVolume(value) {
 
-  const song =
-    songs[index];
-
-
-  if (!song) return;
-
-
-  const key =
-    song.id || song.title;
-
-
-  if (
-    favorites.includes(key)
-  ) {
-
-    favorites =
-      favorites.filter(
-        item => item !== key
-      );
-
-  } else {
-
-    favorites.push(key);
-
-  }
-
-
-  localStorage.setItem(
-    "midnightFavorites",
-    JSON.stringify(favorites)
-  );
-
-
-  updateInterface();
-
-}
-
-
-function toggleCurrentFavorite() {
-
-  toggleFavorite(currentIndex);
-
-}
-
-
-function showFavorites() {
-
-  filteredSongs =
-    songs.filter(song =>
-      favorites.includes(
-        song.id || song.title
+  const newVolume =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Number(value)
       )
     );
 
 
-  renderSongs(filteredSongs);
+  volume =
+    Number.isFinite(newVolume)
+      ? newVolume
+      : 80;
+
+
+  localStorage.setItem(
+    STORAGE.volume,
+    String(volume)
+  );
+
+
+  if (
+    player &&
+    isReady
+  ) {
+
+    player.setVolume(
+      volume
+    );
+
+  }
+
+
+  updateVolumeUI();
 
 }
 
 
-/* =========================================================
-   SEARCH
-========================================================= */
+function toggleMute() {
 
-function searchSongs() {
+  if (
+    !player ||
+    !isReady
+  ) {
 
-  const input =
+    return;
+
+  }
+
+
+  if (
+    player.isMuted()
+  ) {
+
+    player.unMute();
+
+    player.setVolume(
+      volume || 80
+    );
+
+  } else {
+
+    player.mute();
+
+  }
+
+
+  updateVolumeUI();
+
+}
+
+
+function updateVolumeUI() {
+
+  const slider =
     document.getElementById(
-      "searchInput"
+      "volumeSlider"
     );
 
 
-  if (!input) return;
+  if (slider) {
 
-
-  const query =
-    input.value
-      .toLowerCase()
-      .trim();
-
-
-  if (!query) {
-
-    filteredSongs =
-      [...songs];
-
-  } else {
-
-    filteredSongs =
-      songs.filter(song =>
-
-        song.title
-          .toLowerCase()
-          .includes(query)
-
-        ||
-
-        song.artist
-          .toLowerCase()
-          .includes(query)
-
-        ||
-
-        song.genre
-          .toLowerCase()
-          .includes(query)
-
-      );
+    slider.value =
+      volume;
 
   }
-
-
-  renderSongs(filteredSongs);
 
 }
 
 
 /* =========================================================
-   MOOD / GENRE FILTER
+   MEDIA SESSION
 ========================================================= */
 
-function filterMood(mood) {
+function updateMediaSession() {
 
   if (
-    !mood ||
-    mood.toLowerCase() === "all"
+    !("mediaSession" in navigator)
   ) {
 
-    filteredSongs =
-      [...songs];
-
-  } else {
-
-    const searchMood =
-      mood.toLowerCase();
-
-
-    filteredSongs =
-      songs.filter(song =>
-        song.genre
-          .toLowerCase()
-          .includes(searchMood)
-      );
+    return;
 
   }
 
 
-  renderSongs(filteredSongs);
+  const song =
+    getCurrentSong();
+
+
+  if (!song) return;
+
+
+  try {
+
+    navigator.mediaSession.metadata =
+      new MediaMetadata({
+
+        title:
+          song.title,
+
+        artist:
+          song.artist,
+
+        album:
+          "Midnight Radio",
+
+        artwork: [
+
+          {
+            src:
+              song.cover,
+
+            sizes:
+              "480x360",
+
+            type:
+              "image/jpeg"
+          }
+
+        ]
+
+      });
+
+
+    navigator.mediaSession.setActionHandler(
+      "play",
+      () => {
+
+        if (player) {
+          player.playVideo();
+        }
+
+      }
+    );
+
+
+    navigator.mediaSession.setActionHandler(
+      "pause",
+      () => {
+
+        if (player) {
+          player.pauseVideo();
+        }
+
+      }
+    );
+
+
+    navigator.mediaSession.setActionHandler(
+      "nexttrack",
+      nextSong
+    );
+
+
+    navigator.mediaSession.setActionHandler(
+      "previoustrack",
+      previousSong
+    );
+
+
+  } catch (error) {
+
+    console.warn(
+      "Media Session setup failed:",
+      error
+    );
+
+  }
 
 }
 
 
 /* =========================================================
-   SHUFFLE
+   KEYBOARD SHORTCUTS
 ========================================================= */
 
-function shufflePlaylist() {
+document.addEventListener(
+  "keydown",
+  event => {
 
-  filteredSongs =
-    [...songs];
+    const target =
+      event.target;
 
 
-  for (
-    let i = filteredSongs.length - 1;
-    i > 0;
-    i--
-  ) {
-
-    const j =
-      Math.floor(
-        Math.random() * (i + 1)
+    const typing =
+      target &&
+      (
+        target.tagName ===
+          "INPUT" ||
+        target.tagName ===
+          "TEXTAREA" ||
+        target.isContentEditable
       );
 
 
-    [
-      filteredSongs[i],
-      filteredSongs[j]
-    ] =
-    [
-      filteredSongs[j],
-      filteredSongs[i]
-    ];
+    if (typing) {
+      return;
+    }
+
+
+    if (
+      event.code ===
+      "Space"
+    ) {
+
+      event.preventDefault();
+
+      togglePlay();
+
+    }
+
+
+    if (
+      event.code ===
+      "ArrowRight"
+    ) {
+
+      nextSong();
+
+    }
+
+
+    if (
+      event.code ===
+      "ArrowLeft"
+    ) {
+
+      previousSong();
+
+    }
 
   }
-
-
-  renderSongs(filteredSongs);
-
-
-  if (filteredSongs.length) {
-
-    const shuffledSong =
-      filteredSongs[0];
-
-
-    const index =
-      songs.indexOf(
-        shuffledSong
-      );
-
-
-    playSong(index);
-
-  }
-
-}
+);
 
 
 /* =========================================================
@@ -1254,9 +2656,27 @@ function toggleSidebar() {
     );
 
 
+  if (!sidebar) return;
+
+
+  sidebar.classList.toggle(
+    "open"
+  );
+
+}
+
+
+function closeSidebar() {
+
+  const sidebar =
+    document.querySelector(
+      ".sidebar"
+    );
+
+
   if (sidebar) {
 
-    sidebar.classList.toggle(
+    sidebar.classList.remove(
       "open"
     );
 
@@ -1282,6 +2702,57 @@ function focusSearch() {
 
   input.focus();
 
+  closeSidebar();
+
+}
+
+
+/* =========================================================
+   NAVIGATION STATE
+========================================================= */
+
+function setActiveNav(type) {
+
+  const navItems =
+    document.querySelectorAll(
+      ".nav-item"
+    );
+
+
+  navItems.forEach(
+    item =>
+      item.classList.remove(
+        "active"
+      )
+  );
+
+
+  if (type === "home") {
+
+    navItems[0]?.classList.add(
+      "active"
+    );
+
+  }
+
+
+  if (type === "search") {
+
+    navItems[1]?.classList.add(
+      "active"
+    );
+
+  }
+
+
+  if (type === "favorites") {
+
+    navItems[2]?.classList.add(
+      "active"
+    );
+
+  }
+
 }
 
 
@@ -1296,14 +2767,142 @@ function toggleTheme() {
   );
 
 
-  localStorage.setItem(
-    "midnightTheme",
+  const theme =
     document.body.classList.contains(
       "light"
     )
       ? "light"
-      : "dark"
+      : "dark";
+
+
+  localStorage.setItem(
+    STORAGE.theme,
+    theme
   );
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function showToast(message) {
+
+  let toast =
+    document.getElementById(
+      "midnightToast"
+    );
+
+
+  if (!toast) {
+
+    toast =
+      document.createElement(
+        "div"
+      );
+
+
+    toast.id =
+      "midnightToast";
+
+
+    toast.style.cssText = `
+      position: fixed;
+      left: 50%;
+      bottom: 90px;
+      transform: translateX(-50%) translateY(15px);
+      z-index: 9999;
+      padding: 11px 16px;
+      border-radius: 12px;
+      background: rgba(20,20,28,.94);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: 0 15px 40px rgba(0,0,0,.35);
+      backdrop-filter: blur(15px);
+      font: 500 12px Inter, sans-serif;
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+      max-width: min(90vw, 500px);
+      text-align: center;
+    `;
+
+
+    document.body.appendChild(
+      toast
+    );
+
+  }
+
+
+  toast.textContent =
+    message;
+
+
+  requestAnimationFrame(
+    () => {
+
+      toast.style.opacity =
+        "1";
+
+      toast.style.transform =
+        "translateX(-50%) translateY(0)";
+
+    }
+  );
+
+
+  clearTimeout(
+    toast._timer
+  );
+
+
+  toast._timer =
+    setTimeout(
+      () => {
+
+        toast.style.opacity =
+          "0";
+
+        toast.style.transform =
+          "translateX(-50%) translateY(15px)";
+
+      },
+      3000
+    );
+
+}
+
+
+/* =========================================================
+   FORMAT TIME
+========================================================= */
+
+function formatTime(seconds) {
+
+  seconds =
+    Math.max(
+      0,
+      Math.floor(
+        Number(seconds) || 0
+      )
+    );
+
+
+  const minutes =
+    Math.floor(
+      seconds / 60
+    );
+
+
+  const remaining =
+    seconds % 60;
+
+
+  return `${minutes}:${String(
+    remaining
+  ).padStart(2, "0")}`;
 
 }
 
@@ -1312,7 +2911,7 @@ function toggleTheme() {
    HTML ESCAPE
 ========================================================= */
 
-function escapeHTML(text) {
+function escapeHTML(value) {
 
   const div =
     document.createElement(
@@ -1321,7 +2920,7 @@ function escapeHTML(text) {
 
 
   div.textContent =
-    text;
+    String(value ?? "");
 
 
   return div.innerHTML;
@@ -1330,33 +2929,171 @@ function escapeHTML(text) {
 
 
 /* =========================================================
-   LOAD SAVED THEME
+   INITIALIZE
 ========================================================= */
 
-if (
-  localStorage.getItem(
-    "midnightTheme"
-  ) === "light"
-) {
+function initializeApp() {
 
-  document.body.classList.add(
-    "light"
+  /*
+   * Restore theme.
+   */
+
+  if (
+    localStorage.getItem(
+      STORAGE.theme
+    ) === "light"
+  ) {
+
+    document.body.classList.add(
+      "light"
+    );
+
+  }
+
+
+  /*
+   * Make a fresh initial queue.
+   */
+
+  currentQueue =
+    [...songs];
+
+
+  /*
+   * Restore saved song.
+   */
+
+  const savedId =
+    localStorage.getItem(
+      STORAGE.currentSong
+    );
+
+
+  if (savedId) {
+
+    const index =
+      songs.findIndex(
+        song =>
+          song.id === savedId
+      );
+
+
+    if (index >= 0) {
+
+      currentIndex =
+        index;
+
+    }
+
+  }
+
+
+  syncQueueIndex();
+
+  renderSongs();
+
+  updateInterface();
+
+  updateVolumeUI();
+
+  updateRepeatButton();
+
+  updatePlayButton();
+
+
+  /*
+   * Progress timer.
+   */
+
+  setInterval(
+    updateProgress,
+    500
+  );
+
+
+  /*
+   * Close mobile sidebar
+   * when clicking outside it.
+   */
+
+  document.addEventListener(
+    "click",
+    event => {
+
+      const sidebar =
+        document.querySelector(
+          ".sidebar"
+        );
+
+
+      const menu =
+        document.querySelector(
+          ".mobile-menu"
+        );
+
+
+      if (
+        !sidebar ||
+        !sidebar.classList.contains(
+          "open"
+        )
+      ) {
+
+        return;
+
+      }
+
+
+      if (
+        sidebar.contains(
+          event.target
+        ) ||
+        menu?.contains(
+          event.target
+        )
+      ) {
+
+        return;
+
+      }
+
+
+      closeSidebar();
+
+    }
+  );
+
+
+  /*
+   * Save player position
+   * before leaving.
+   */
+
+  window.addEventListener(
+    "beforeunload",
+    saveCurrentSong
   );
 
 }
 
 
 /* =========================================================
-   INITIAL RENDER
+   DOM READY
 ========================================================= */
 
-document.addEventListener(
-  "DOMContentLoaded",
-  function () {
+if (
+  document.readyState ===
+  "loading"
+) {
 
-    renderSongs();
+  document.addEventListener(
+    "DOMContentLoaded",
+    initializeApp
+  );
 
-    updateInterface();
+} else {
 
-  }
-);
+  initializeApp();
+
+}
+:::
