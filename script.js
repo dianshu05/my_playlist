@@ -34,25 +34,25 @@ const songs = [
     id: "s3a4OQR-10M",
     duration: "4:28",
     genre: "Indie Rock",
-    cover: "https://i.ytimg.com/vi/J3_P_H_11mE/hqdefault.jpg"
+    cover: "https://i.ytimg.com/vi/s3a4OQR-10M/hqdefault.jpg"
   },
 
   {
     title: "Borderline",
     artist: "Tame Impala",
-    id: "vpbblMR_jUo",
+    id: "2g5xkLqIElU",
     duration: "3:58",
     genre: "Psychedelic Pop",
-    cover: "https://i.ytimg.com/vi/vpbblMR_jUo/hqdefault.jpg"
+    cover: "https://i.ytimg.com/vi/2g5xkLqIElU/hqdefault.jpg"
   },
 
   {
     title: "New Person, Same Old Mistakes",
     artist: "Tame Impala",
-    id: "tO4Plmvd_38",
+    id: "_9bw_VtMUGA",
     duration: "6:05",
     genre: "Psychedelic Pop",
-    cover: "https://i.ytimg.com/vi/tO4Plmvd_38/hqdefault.jpg"
+    cover: "https://i.ytimg.com/vi/_9bw_VtMUGA/hqdefault.jpg"
   },
 
   {
@@ -76,10 +76,10 @@ const songs = [
   {
     title: "Babydoll",
     artist: "Dominic Fike",
-    id: "x9U_K6C_qgU",
+    id: "nb8CnIo_-_A",
     duration: "1:40",
     genre: "Alternative",
-    cover: "https://i.ytimg.com/vi/x9U_K6C_qgU/hqdefault.jpg"
+    cover: "https://i.ytimg.com/vi/nb8CnIo_-_A/hqdefault.jpg"
   },
 
   {
@@ -121,10 +121,10 @@ const songs = [
   {
     title: "Let It Happen",
     artist: "Tame Impala",
-    id: "pFpt7PAUR7U",
+    id: "pFptt7Cargc",
     duration: "7:51",
     genre: "Psychedelic Rock",
-    cover: "https://i.ytimg.com/vi/pFpt7PAUR7U/hqdefault.jpg"
+    cover: "https://i.ytimg.com/vi/pFptt7Cargc/hqdefault.jpg"
   },
 
   {
@@ -139,37 +139,37 @@ const songs = [
   {
     title: "Too Sweet",
     artist: "Hozier",
-    id: "a7fzkqL_Vog",
+    id: "NTpbbQUBbuo",
     duration: "4:12",
     genre: "Indie Rock",
-    cover: "https://i.ytimg.com/vi/a7fzkqL_Vog/hqdefault.jpg"
+    cover: "https://i.ytimg.com/vi/NTpbbQUBbuo/hqdefault.jpg"
   },
 
   {
     title: "back to friends",
     artist: "sombr",
-    id: "uKq1U1jH3t8",
+    id: "c8zq4kAn_O0",
     duration: "3:22",
     genre: "Indie Pop",
-    cover: "https://i.ytimg.com/vi/uKq1U1jH3t8/hqdefault.jpg"
+    cover: "https://i.ytimg.com/vi/c8zq4kAn_O0/hqdefault.jpg"
   },
 
   {
     title: "Self Aware",
     artist: "Temper City",
-    id: "yA8P_1T3z-E",
+    id: "mh4AQkw4Jjc",
     duration: "3:01",
     genre: "Indie",
-    cover: "https://i.ytimg.com/vi/yA8P_1T3z-E/hqdefault.jpg"
+    cover: "https://i.ytimg.com/vi/mh4AQkw4Jjc/hqdefault.jpg"
   },
 
   {
     title: "End Of Beginning",
     artist: "Djo",
-    id: "E29o3WcM3L4",
+    id: "xy3AcmW0lrQ",
     duration: "2:40",
     genre: "Indie Rock",
-    cover: "https://i.ytimg.com/vi/E29o3WcM3L4/hqdefault.jpg"
+    cover: "https://i.ytimg.com/vi/xy3AcmW0lrQ/hqdefault.jpg"
   },
 
   {
@@ -184,10 +184,10 @@ const songs = [
   {
     title: "Electric Love",
     artist: "BØRNS",
-    id: "RYr96YYEaNc",
+    id: "RYr96YYEaZY",
     duration: "3:41",
     genre: "Indie Pop",
-    cover: "https://i.ytimg.com/vi/RYr96YYEaNc/hqdefault.jpg"
+    cover: "https://i.ytimg.com/vi/RYr96YYEaZY/hqdefault.jpg"
   },
 
   {
