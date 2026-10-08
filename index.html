@@ -1,29 +1,15 @@
-:::writing{variant="document" id="58321" title="Midnight Radio — index.html"}
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
 
-    <meta
-        name="theme-color"
-        content="#08090d"
-    >
+    <title>Midnight Radio</title>
 
-    <meta
-        name="description"
-        content="Midnight Radio — a personal YouTube music player."
-    >
-
-    <title>Midnight Radio — Music Player</title>
-
-    <!-- Google Fonts -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -36,21 +22,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
 
-    <!-- =========================
-         BACKGROUND
-    ========================== -->
-
+    <!-- Background -->
     <div class="background-glow glow-one"></div>
     <div class="background-glow glow-two"></div>
 
 
-    <!-- =========================
-         MOBILE SIDEBAR OVERLAY
-    ========================== -->
-
+    <!-- MOBILE SIDEBAR OVERLAY -->
     <div
         class="sidebar-overlay"
         id="sidebarOverlay"
@@ -58,21 +37,16 @@
     ></div>
 
 
-    <!-- =========================
-         APP
-    ========================== -->
-
     <div class="app">
 
 
-        <!-- =========================
+        <!-- =========================================
              SIDEBAR
-        ========================== -->
+        ========================================== -->
 
         <aside class="sidebar" id="sidebar">
 
             <!-- Logo -->
-
             <div class="logo">
 
                 <div class="logo-icon">
@@ -80,145 +54,113 @@
                 </div>
 
                 <div>
-                    <strong>Midnight</strong>
-                    <span>Radio</span>
+                    <strong>Midnight Radio</strong>
+                    <span>Your private station</span>
                 </div>
 
             </div>
 
 
-            <!-- Main Navigation -->
+            <!-- MOBILE CLOSE BUTTON -->
+            <button
+                class="sidebar-close"
+                id="sidebarClose"
+                type="button"
+                aria-label="Close navigation"
+            >
+                ×
+            </button>
 
-            <nav aria-label="Main navigation">
+
+            <!-- Navigation -->
+            <nav>
 
                 <button
-                    type="button"
                     class="nav-item active"
-                    data-nav="home"
-                    onclick="showHome()"
+                    type="button"
+                    data-action="home"
                 >
                     <span>⌂</span>
-                    <label>Home</label>
+                    <strong>Home</strong>
                 </button>
 
-
                 <button
-                    type="button"
                     class="nav-item"
-                    data-nav="discover"
-                    onclick="showDiscover()"
-                >
-                    <span>✦</span>
-                    <label>Discover</label>
-                </button>
-
-
-                <button
                     type="button"
-                    class="nav-item"
-                    data-nav="favorites"
-                    onclick="showFavorites()"
+                    data-action="favorites"
                 >
                     <span>♥</span>
-                    <label>Favorites</label>
+                    <strong>Favorites</strong>
+                </button>
+
+                <button
+                    class="nav-item"
+                    type="button"
+                    data-action="all"
+                >
+                    <span>♫</span>
+                    <strong>All Songs</strong>
                 </button>
 
             </nav>
 
 
             <!-- Mood -->
-
             <div class="sidebar-section">
 
                 <div class="section-label">
-                    MOOD
+                    MOODS
                 </div>
 
-
                 <button
-                    type="button"
                     class="mood-btn"
-                    onclick="filterMood('Indie')"
+                    type="button"
+                    data-mood="Indie"
                 >
                     <span>☾</span>
-                    <label>Indie</label>
+                    Indie
                 </button>
 
-
                 <button
-                    type="button"
                     class="mood-btn"
-                    onclick="filterMood('Indie Pop')"
+                    type="button"
+                    data-mood="Psychedelic"
                 >
-                    <span>✧</span>
-                    <label>Indie Pop</label>
+                    <span>✦</span>
+                    Psychedelic
                 </button>
 
-
                 <button
-                    type="button"
                     class="mood-btn"
-                    onclick="filterMood('Indie Rock')"
-                >
-                    <span>◈</span>
-                    <label>Indie Rock</label>
-                </button>
-
-
-                <button
                     type="button"
-                    class="mood-btn"
-                    onclick="filterMood('R&B')"
+                    data-mood="R&B"
                 >
                     <span>♡</span>
-                    <label>R&B / Soul</label>
+                    R&B / Soul
                 </button>
 
-
                 <button
-                    type="button"
                     class="mood-btn"
-                    onclick="filterMood('Psychedelic')"
+                    type="button"
+                    data-mood="Pop"
                 >
-                    <span>◉</span>
-                    <label>Psychedelic</label>
+                    <span>●</span>
+                    Pop
                 </button>
 
-
                 <button
-                    type="button"
                     class="mood-btn"
-                    onclick="filterMood('Electropop')"
-                >
-                    <span>⚡</span>
-                    <label>Electronic</label>
-                </button>
-
-
-                <button
                     type="button"
-                    class="mood-btn"
-                    onclick="filterMood('Hip Hop')"
+                    data-mood="Hip Hop"
                 >
                     <span>◆</span>
-                    <label>Hip Hop</label>
-                </button>
-
-
-                <button
-                    type="button"
-                    class="mood-btn"
-                    onclick="filterMood('all')"
-                >
-                    <span>∞</span>
-                    <label>All Music</label>
+                    Hip Hop
                 </button>
 
             </div>
 
 
-            <!-- Sidebar Bottom -->
-
+            <!-- Bottom -->
             <div class="sidebar-bottom">
 
                 <div class="mini-note">
@@ -226,10 +168,9 @@
                     <span>♫</span>
 
                     <div>
-                        <b>Midnight Radio</b>
-
+                        <b>Late night listening</b>
                         <small>
-                            Your late night soundtrack
+                            Stay awhile.
                         </small>
                     </div>
 
@@ -240,69 +181,48 @@
         </aside>
 
 
-
-        <!-- =========================
+        <!-- =========================================
              MAIN CONTENT
-        ========================== -->
+        ========================================== -->
 
-        <main class="content" id="mainContent">
+        <main class="content">
 
 
-            <!-- =========================
-                 TOP BAR
-            ========================== -->
-
+            <!-- TOP BAR -->
             <header class="topbar">
 
+                <!-- Mobile menu -->
                 <button
-                    type="button"
                     class="mobile-menu"
                     id="mobileMenu"
-                    onclick="toggleSidebar()"
+                    type="button"
                     aria-label="Open navigation"
-                    aria-controls="sidebar"
                     aria-expanded="false"
                 >
                     ☰
                 </button>
 
 
+                <!-- Search -->
                 <div class="search-box">
 
-                    <span aria-hidden="true">
-                        ⌕
-                    </span>
+                    <span>⌕</span>
 
                     <input
                         type="search"
                         id="searchInput"
-                        placeholder="Search songs, artists or genres..."
+                        placeholder="Search songs, artists, genres..."
                         autocomplete="off"
-                        aria-label="Search music"
                     >
-
-                    <button
-                        type="button"
-                        id="clearSearch"
-                        aria-label="Clear search"
-                        style="
-                            display:none;
-                            background:none;
-                            color:#888;
-                            font-size:18px;
-                        "
-                    >
-                        ×
-                    </button>
 
                 </div>
 
 
+                <!-- Theme -->
                 <button
-                    type="button"
                     class="theme-btn"
                     id="themeButton"
-                    onclick="toggleTheme()"
+                    type="button"
                     aria-label="Toggle theme"
                 >
                     ☼
@@ -311,41 +231,34 @@
             </header>
 
 
-
-            <!-- =========================
+            <!-- =========================================
                  HERO
-            ========================== -->
+            ========================================== -->
 
             <section class="hero">
 
                 <div class="hero-text">
 
                     <div class="eyebrow">
-
                         <span class="pulse"></span>
-
                         YOUR NIGHTTIME SOUNDTRACK
-
                     </div>
-
 
                     <h1>
                         Music for
                         <span>midnight.</span>
                     </h1>
 
-
                     <p>
-                        A hand-picked collection of dreamy
+                        A carefully selected collection of
                         indie, psychedelic, alternative and
                         late-night sounds.
                     </p>
 
-
                     <button
-                        type="button"
                         class="hero-play"
-                        onclick="playFirst()"
+                        id="heroPlay"
+                        type="button"
                     >
                         <span>▶</span>
                         Play something
@@ -354,9 +267,10 @@
                 </div>
 
 
-                <!-- Hero Artwork -->
-
+                <!-- Hero artwork -->
                 <div class="hero-art">
+
+                    <div class="moon"></div>
 
                     <div class="stars">
                         <i></i>
@@ -368,14 +282,8 @@
                         <i></i>
                     </div>
 
-
-                    <div class="moon"></div>
-
-
                     <div class="mountain mountain-back"></div>
-
                     <div class="mountain mountain-front"></div>
-
 
                     <div class="hero-character">
                         ♪
@@ -386,43 +294,31 @@
             </section>
 
 
-
-            <!-- =========================
+            <!-- =========================================
                  PLAYER
-            ========================== -->
+            ========================================== -->
 
-            <section
-                class="player-card"
-                aria-label="Music player"
-            >
+            <section class="player-card">
 
 
-                <!-- YouTube player -->
-
+                <!-- YouTube -->
                 <div class="player-video">
 
-                    <div
-                        id="youtube-player"
-                    ></div>
+                    <div id="youtube-player"></div>
 
                 </div>
 
 
-                <!-- Player Information -->
-
+                <!-- Player information -->
                 <div class="player-info">
 
                     <div class="now-playing">
 
-                        <span>
-                            NOW PLAYING
-                        </span>
-
+                        <span>NOW PLAYING</span>
 
                         <h2 id="playingTitle">
                             The Less I Know The Better
                         </h2>
-
 
                         <span id="playingArtist">
                             Tame Impala
@@ -432,48 +328,38 @@
 
 
                     <!-- Controls -->
-
                     <div class="player-controls">
 
                         <button
+                            id="previousButton"
                             type="button"
-                            onclick="previousSong()"
                             aria-label="Previous song"
-                            title="Previous"
                         >
-                            ‹‹
+                            ↶
                         </button>
 
-
                         <button
-                            type="button"
-                            class="main-play"
                             id="playButton"
-                            onclick="togglePlay()"
+                            class="main-play"
+                            type="button"
                             aria-label="Play or pause"
-                            title="Play / Pause"
                         >
                             ▶
                         </button>
 
-
                         <button
+                            id="nextButton"
                             type="button"
-                            onclick="nextSong()"
                             aria-label="Next song"
-                            title="Next"
                         >
-                            ››
+                            ↷
                         </button>
 
-
                         <button
-                            type="button"
-                            class="heart-btn"
                             id="currentFavorite"
-                            onclick="toggleCurrentFavorite()"
-                            aria-label="Add to favorites"
-                            title="Favorite"
+                            class="heart-btn"
+                            type="button"
+                            aria-label="Favorite current song"
                         >
                             ♡
                         </button>
@@ -485,15 +371,11 @@
             </section>
 
 
+            <!-- =========================================
+                 SONG LIST
+            ========================================== -->
 
-            <!-- =========================
-                 MUSIC LIST
-            ========================== -->
-
-            <section
-                class="music-section"
-                id="musicSection"
-            >
+            <section class="music-section">
 
                 <div class="section-heading">
 
@@ -503,49 +385,41 @@
                             YOUR COLLECTION
                         </div>
 
-                        <h2 id="playlistTitle">
-                            Your Playlist
+                        <h2>
+                            All Songs
                         </h2>
 
                     </div>
 
-
                     <button
-                        type="button"
                         class="shuffle-btn"
-                        onclick="shufflePlaylist()"
+                        id="shuffleButton"
+                        type="button"
                     >
-                        ⤨ Shuffle
+                        ⇄ Shuffle
                     </button>
 
                 </div>
 
 
-                <!-- Playlist -->
-
                 <div
                     class="song-list"
                     id="songList"
-                >
-                    <!-- Songs generated by JavaScript -->
-                </div>
+                ></div>
 
             </section>
+
 
         </main>
 
     </div>
 
 
-
-    <!-- =========================
+    <!-- =========================================
          MOBILE PLAYER
-    ========================== -->
+    ========================================== -->
 
-    <div
-        class="mobile-player"
-        id="mobilePlayer"
-    >
+    <div class="mobile-player" id="mobilePlayer">
 
         <div class="mobile-song">
 
@@ -555,7 +429,6 @@
             >
                 ♪
             </div>
-
 
             <div>
 
@@ -573,345 +446,215 @@
 
 
         <button
+            id="mobilePrevious"
             type="button"
-            onclick="previousSong()"
             aria-label="Previous song"
         >
-            ‹
+            ↶
         </button>
 
-
         <button
-            type="button"
             id="mobilePlay"
-            onclick="togglePlay()"
+            type="button"
             aria-label="Play or pause"
         >
             ▶
         </button>
 
-
         <button
+            id="mobileNext"
             type="button"
-            onclick="nextSong()"
             aria-label="Next song"
         >
-            ›
+            ↷
         </button>
 
     </div>
 
 
-
-    <!-- =========================
-         YOUTUBE IFRAME API
-    ========================== -->
+    <!-- =========================================
+         YOUTUBE API
+    ========================================== -->
 
     <script src="https://www.youtube.com/iframe_api"></script>
 
 
-    <!-- =========================
-         YOUR JAVASCRIPT
-    ========================== -->
+    <!-- =========================================
+         APP JAVASCRIPT
+    ========================================== -->
 
     <script src="script.js"></script>
 
 
-    <!-- =========================
-         SMALL HTML SAFETY / UI
-    ========================== -->
+    <!-- =========================================
+         MOBILE NAVIGATION FIX
+    ========================================== -->
 
     <script>
 
-        document.addEventListener(
-            "DOMContentLoaded",
-            function () {
+        document.addEventListener("DOMContentLoaded", () => {
 
-                const searchInput =
-                    document.getElementById(
-                        "searchInput"
-                    );
+            const sidebar =
+                document.getElementById("sidebar");
 
-                const clearSearch =
-                    document.getElementById(
-                        "clearSearch"
-                    );
+            const overlay =
+                document.getElementById("sidebarOverlay");
 
-                const mobileMenu =
-                    document.getElementById(
-                        "mobileMenu"
-                    );
+            const menu =
+                document.getElementById("mobileMenu");
+
+            const close =
+                document.getElementById("sidebarClose");
 
 
-                /* Search */
+            function openSidebar() {
 
-                if (searchInput) {
+                sidebar.classList.add("open");
 
-                    searchInput.addEventListener(
-                        "input",
-                        function () {
+                overlay.classList.add("show");
 
-                            if (typeof searchSongs === "function") {
-                                searchSongs();
-                            }
-
-                            if (clearSearch) {
-
-                                clearSearch.style.display =
-                                    this.value
-                                        ? "block"
-                                        : "none";
-
-                            }
-
-                        }
-                    );
-
-
-                    searchInput.addEventListener(
-                        "keydown",
-                        function (event) {
-
-                            if (
-                                event.key ===
-                                "Escape"
-                            ) {
-
-                                this.value = "";
-
-                                if (
-                                    typeof searchSongs ===
-                                    "function"
-                                ) {
-                                    searchSongs();
-                                }
-
-                                if (clearSearch) {
-                                    clearSearch.style.display =
-                                        "none";
-                                }
-
-                            }
-
-                        }
-                    );
-
-                }
-
-
-                /* Clear search */
-
-                if (clearSearch) {
-
-                    clearSearch.addEventListener(
-                        "click",
-                        function () {
-
-                            searchInput.value = "";
-
-                            searchInput.focus();
-
-                            if (
-                                typeof searchSongs ===
-                                "function"
-                            ) {
-                                searchSongs();
-                            }
-
-                            clearSearch.style.display =
-                                "none";
-
-                        }
-                    );
-
-                }
-
-
-                /* Sidebar */
-
-                const overlay =
-                    document.getElementById(
-                        "sidebarOverlay"
-                    );
-
-
-                if (overlay) {
-
-                    overlay.addEventListener(
-                        "click",
-                        function () {
-
-                            if (
-                                typeof closeSidebar ===
-                                "function"
-                            ) {
-                                closeSidebar();
-                            }
-
-                        }
-                    );
-
-                }
-
-
-                /* Escape closes sidebar */
-
-                document.addEventListener(
-                    "keydown",
-                    function (event) {
-
-                        if (
-                            event.key === "Escape"
-                        ) {
-
-                            if (
-                                typeof closeSidebar ===
-                                "function"
-                            ) {
-                                closeSidebar();
-                            }
-
-                        }
-
-                    }
+                menu.setAttribute(
+                    "aria-expanded",
+                    "true"
                 );
 
+                overlay.setAttribute(
+                    "aria-hidden",
+                    "false"
+                );
 
-                /* Close drawer after navigation */
+                document.body.classList.add(
+                    "sidebar-open"
+                );
 
-                document.addEventListener(
+            }
+
+
+            function closeSidebar() {
+
+                sidebar.classList.remove("open");
+
+                overlay.classList.remove("show");
+
+                menu.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+                overlay.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+
+                document.body.classList.remove(
+                    "sidebar-open"
+                );
+
+            }
+
+
+            if (menu) {
+
+                menu.addEventListener(
                     "click",
-                    function (event) {
+                    openSidebar
+                );
 
-                        const item =
-                            event.target.closest(
-                                ".nav-item, .mood-btn"
-                            );
+            }
 
-                        if (!item) return;
 
-                        if (
-                            window.innerWidth <= 700
-                        ) {
+            if (close) {
+
+                close.addEventListener(
+                    "click",
+                    closeSidebar
+                );
+
+            }
+
+
+            if (overlay) {
+
+                overlay.addEventListener(
+                    "click",
+                    closeSidebar
+                );
+
+            }
+
+
+            /*
+             * Close navigation when a navigation
+             * item is selected.
+             */
+
+            document
+                .querySelectorAll(
+                    ".nav-item, .mood-btn"
+                )
+                .forEach(button => {
+
+                    button.addEventListener(
+                        "click",
+                        () => {
 
                             if (
-                                typeof closeSidebar ===
-                                "function"
+                                window.innerWidth <= 700
                             ) {
+
                                 closeSidebar();
+
                             }
 
                         }
-
-                    }
-                );
-
-            }
-        );
-
-
-        /* =====================================
-           OPTIONAL NAVIGATION HELPERS
-        ===================================== */
-
-        function showHome() {
-
-            document
-                .querySelectorAll(".nav-item")
-                .forEach(item => {
-                    item.classList.remove("active");
-                });
-
-
-            const home =
-                document.querySelector(
-                    '[data-nav="home"]'
-                );
-
-
-            if (home) {
-                home.classList.add("active");
-            }
-
-
-            const title =
-                document.getElementById(
-                    "playlistTitle"
-                );
-
-
-            if (title) {
-                title.textContent =
-                    "Your Playlist";
-            }
-
-
-            if (
-                typeof searchSongs ===
-                "function"
-            ) {
-
-                const input =
-                    document.getElementById(
-                        "searchInput"
                     );
 
-                if (input) {
-                    input.value = "";
-                }
-
-                filteredSongs = [...songs];
-
-                renderSongs(filteredSongs);
-
-            }
-
-        }
-
-
-        function showDiscover() {
-
-            document
-                .querySelectorAll(".nav-item")
-                .forEach(item => {
-                    item.classList.remove("active");
                 });
 
 
-            const discover =
-                document.querySelector(
-                    '[data-nav="discover"]'
-                );
+            /*
+             * ESC closes mobile navigation.
+             */
+
+            document.addEventListener(
+                "keydown",
+                event => {
+
+                    if (
+                        event.key === "Escape"
+                    ) {
+
+                        closeSidebar();
+
+                    }
+
+                }
+            );
 
 
-            if (discover) {
-                discover.classList.add("active");
-            }
+            /*
+             * If screen becomes desktop,
+             * automatically reset mobile state.
+             */
 
+            window.addEventListener(
+                "resize",
+                () => {
 
-            const title =
-                document.getElementById(
-                    "playlistTitle"
-                );
+                    if (
+                        window.innerWidth > 700
+                    ) {
 
+                        closeSidebar();
 
-            if (title) {
-                title.textContent =
-                    "Discover";
-            }
+                    }
 
+                }
+            );
 
-            filteredSongs =
-                [...songs];
-
-
-            renderSongs(filteredSongs);
-
-        }
+        });
 
     </script>
 
 </body>
-
 </html>
-:::
