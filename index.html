@@ -1,370 +1,917 @@
-:::writing{variant="document" id="58321" title="Midnight Radio — index.html"} <!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8">
+:::writing{variant="document" id="58321" title="Midnight Radio — index.html"}
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0"
+<!DOCTYPE html>
+<html lang="en">
 
-<meta name="description" content="Midnight Radio — your late night music soundtrack."
+<head>
+    <meta charset="UTF-8">
 
-<meta name="theme-color" content="#08090d"
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>Midnight Radio 🎧</title>
+    <meta
+        name="theme-color"
+        content="#08090d"
+    >
 
-<!-- Fonts --> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta
+        name="description"
+        content="Midnight Radio — a personal YouTube music player."
+    >
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"
+    <title>Midnight Radio — Music Player</title>
 
-<!-- Main stylesheet --> <link rel="stylesheet" href="style.css"> </head>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
 
 <body>
 
-<!-- ===================================================== BACKGROUND ====================================================== -->
+    <!-- =========================
+         BACKGROUND
+    ========================== -->
 
-<div class="background-glow glow-one" aria-hidden="true"
+    <div class="background-glow glow-one"></div>
+    <div class="background-glow glow-two"></div>
 
-</div>
-<div class="background-glow glow-two" aria-hidden="true"
 
-</div>
-<!-- ===================================================== APPLICATION ====================================================== -->
+    <!-- =========================
+         MOBILE SIDEBAR OVERLAY
+    ========================== -->
 
-<main class="app">
+    <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+        aria-hidden="true"
+    ></div>
 
-<!-- ================================================= SIDEBAR ================================================== -->
 
-<aside class="sidebar" id="sidebar" aria-label="Main sidebar" >
+    <!-- =========================
+         APP
+    ========================== -->
 
-<!-- Logo -->
+    <div class="app">
 
-<div class="logo">
 
-<div class="logo-icon" aria-hidden="true" > ♫ </div>
+        <!-- =========================
+             SIDEBAR
+        ========================== -->
 
-<div class="logo-text"> <strong>Midnight</strong> <span>Radio</span> </div>
+        <aside class="sidebar" id="sidebar">
 
-</div>
+            <!-- Logo -->
 
-<!-- Main navigation -->
+            <div class="logo">
 
-<nav class="main-nav" aria-label="Main navigation" >
+                <div class="logo-icon">
+                    ♪
+                </div>
 
-<button type="button" class="nav-item active" data-action="home" > <span aria-hidden="true">⌂</span> <span>Home</span> </button>
+                <div>
+                    <strong>Midnight</strong>
+                    <span>Radio</span>
+                </div>
 
-<button type="button" class="nav-item" data-action="search" > <span aria-hidden="true">⌕</span> <span>Search</span> </button>
+            </div>
 
-<button type="button" class="nav-item" data-action="favorites" > <span aria-hidden="true">♡</span> <span>Favorites</span> </button>
 
-</nav>
+            <!-- Main Navigation -->
 
-<!-- Mood filters -->
+            <nav aria-label="Main navigation">
 
-<div class="sidebar-section">
+                <button
+                    type="button"
+                    class="nav-item active"
+                    data-nav="home"
+                    onclick="showHome()"
+                >
+                    <span>⌂</span>
+                    <label>Home</label>
+                </button>
 
-<div class="section-label"> YOUR MOOD </div>
 
-<button type="button" class="mood-btn active" data-mood="all" > ✦ All Music </button>
+                <button
+                    type="button"
+                    class="nav-item"
+                    data-nav="discover"
+                    onclick="showDiscover()"
+                >
+                    <span>✦</span>
+                    <label>Discover</label>
+                </button>
 
-<button type="button" class="mood-btn" data-mood="indie" > ◉ Indie </button>
 
-<button type="button" class="mood-btn" data-mood="pop" > ✦ Pop </button>
+                <button
+                    type="button"
+                    class="nav-item"
+                    data-nav="favorites"
+                    onclick="showFavorites()"
+                >
+                    <span>♥</span>
+                    <label>Favorites</label>
+                </button>
 
-<button type="button" class="mood-btn" data-mood="rock" > ◉ Rock </button>
+            </nav>
 
-<button type="button" class="mood-btn" data-mood="r&b" > ♫ R&B </button>
 
-<button type="button" class="mood-btn" data-mood="hip hop" > ◆ Hip Hop </button>
+            <!-- Mood -->
 
-<button type="button" class="mood-btn" data-mood="electro" > ◇ Electronic </button>
+            <div class="sidebar-section">
 
-</div>
+                <div class="section-label">
+                    MOOD
+                </div>
 
-<!-- Sidebar footer -->
 
-<div class="sidebar-bottom">
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('Indie')"
+                >
+                    <span>☾</span>
+                    <label>Indie</label>
+                </button>
 
-<div class="mini-note">
 
-<span aria-hidden="true">☾</span>
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('Indie Pop')"
+                >
+                    <span>✧</span>
+                    <label>Indie Pop</label>
+                </button>
 
-<div> <b>Late night mode</b> <small>Perfect for studying</small> </div>
 
-</div>
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('Indie Rock')"
+                >
+                    <span>◈</span>
+                    <label>Indie Rock</label>
+                </button>
 
-</div>
 
-</aside>
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('R&B')"
+                >
+                    <span>♡</span>
+                    <label>R&B / Soul</label>
+                </button>
 
-<!-- ================================================= MAIN CONTENT ================================================== -->
 
-<section class="content">
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('Psychedelic')"
+                >
+                    <span>◉</span>
+                    <label>Psychedelic</label>
+                </button>
 
-<!-- ================================================= TOP BAR ================================================== -->
 
-<header class="topbar">
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('Electropop')"
+                >
+                    <span>⚡</span>
+                    <label>Electronic</label>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('Hip Hop')"
+                >
+                    <span>◆</span>
+                    <label>Hip Hop</label>
+                </button>
 
-<!-- Mobile menu -->
+
+                <button
+                    type="button"
+                    class="mood-btn"
+                    onclick="filterMood('all')"
+                >
+                    <span>∞</span>
+                    <label>All Music</label>
+                </button>
 
-<button type="button" class="mobile-menu" id="mobileMenuButton" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false" > ☰ </button>
+            </div>
 
-<!-- Search -->
 
-<div class="search-box">
+            <!-- Sidebar Bottom -->
 
-<span class="search-icon" aria-hidden="true" > ⌕ </span>
+            <div class="sidebar-bottom">
 
-<input id="searchInput" type="search" placeholder="Search songs, artists..." autocomplete="off" spellcheck="false" aria-label="Search songs and artists" >
+                <div class="mini-note">
 
-<button type="button" class="clear-search" id="clearSearch" aria-label="Clear search" hidden > × </button>
+                    <span>♫</span>
 
-</div>
+                    <div>
+                        <b>Midnight Radio</b>
 
-<!-- Theme -->
+                        <small>
+                            Your late night soundtrack
+                        </small>
+                    </div>
 
-<button type="button" class="theme-btn" id="themeButton" title="Change theme" aria-label="Change theme" > ◐ </button>
+                </div>
 
-</header>
+            </div>
 
-<!-- ================================================= HERO ================================================== -->
+        </aside>
 
-<section class="hero" aria-label="Midnight Radio introduction" >
 
-<div class="hero-text">
 
-<div class="eyebrow">
+        <!-- =========================
+             MAIN CONTENT
+        ========================== -->
 
-<span class="pulse" aria-hidden="true" ></span>
+        <main class="content" id="mainContent">
 
-PLAYING AFTER DARK
 
-</div>
+            <!-- =========================
+                 TOP BAR
+            ========================== -->
 
-<h1> Your midnight<br> <span>soundtrack.</span> </h1>
+            <header class="topbar">
 
-<p> Lofi beats, dreamy indie and everything that sounds better after midnight. </p>
+                <button
+                    type="button"
+                    class="mobile-menu"
+                    id="mobileMenu"
+                    onclick="toggleSidebar()"
+                    aria-label="Open navigation"
+                    aria-controls="sidebar"
+                    aria-expanded="false"
+                >
+                    ☰
+                </button>
 
-<button type="button" class="hero-play" id="heroPlayButton" > <span aria-hidden="true">▶</span> <span>Start listening</span> </button>
 
-</div>
+                <div class="search-box">
 
-<!-- Hero artwork -->
+                    <span aria-hidden="true">
+                        ⌕
+                    </span>
 
-<div class="hero-art" aria-hidden="true" >
+                    <input
+                        type="search"
+                        id="searchInput"
+                        placeholder="Search songs, artists or genres..."
+                        autocomplete="off"
+                        aria-label="Search music"
+                    >
 
-<div class="moon"></div>
+                    <button
+                        type="button"
+                        id="clearSearch"
+                        aria-label="Clear search"
+                        style="
+                            display:none;
+                            background:none;
+                            color:#888;
+                            font-size:18px;
+                        "
+                    >
+                        ×
+                    </button>
 
-<div class="stars"> <i></i> <i></i> <i></i> <i></i> <i></i> <i></i> <i></i> </div>
+                </div>
 
-<div class="mountain mountain-back"></div> <div class="mountain mountain-front"></div>
 
-<div class="hero-character"> ♫ </div>
+                <button
+                    type="button"
+                    class="theme-btn"
+                    id="themeButton"
+                    onclick="toggleTheme()"
+                    aria-label="Toggle theme"
+                >
+                    ☼
+                </button>
 
-</div>
+            </header>
 
-</section>
 
-<!-- ================================================= PLAYER ================================================== -->
 
-<section class="player-card" aria-label="Music player" >
+            <!-- =========================
+                 HERO
+            ========================== -->
 
-<!-- YouTube player -->
+            <section class="hero">
 
-<div class="player-video">
+                <div class="hero-text">
 
-<div id="youtube-player" class="youtube-player" >
+                    <div class="eyebrow">
 
-<div class="youtube-placeholder">
+                        <span class="pulse"></span>
 
-<span aria-hidden="true">♫</span>
+                        YOUR NIGHTTIME SOUNDTRACK
 
-<p> Select a song to start listening </p>
+                    </div>
 
-</div>
 
-</div>
+                    <h1>
+                        Music for
+                        <span>midnight.</span>
+                    </h1>
 
-</div>
 
-<!-- Player information -->
+                    <p>
+                        A hand-picked collection of dreamy
+                        indie, psychedelic, alternative and
+                        late-night sounds.
+                    </p>
 
-<div class="player-info">
 
-<div class="now-playing">
+                    <button
+                        type="button"
+                        class="hero-play"
+                        onclick="playFirst()"
+                    >
+                        <span>▶</span>
+                        Play something
+                    </button>
 
-<span>NOW PLAYING</span>
+                </div>
 
-<div id="playingTitle"> Select a song </div>
 
-<small id="playingArtist"> Nothing playing </small>
+                <!-- Hero Artwork -->
 
-</div>
+                <div class="hero-art">
 
-<!-- Player controls -->
+                    <div class="stars">
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                    </div>
 
-<div class="player-controls" aria-label="Playback controls" >
 
-<button type="button" id="previousButton" title="Previous song" aria-label="Previous song" > ↶ </button>
+                    <div class="moon"></div>
 
-<button type="button" class="main-play" id="playButton" title="Play" aria-label="Play or pause" > ▶ </button>
 
-<button type="button" id="nextButton" title="Next song" aria-label="Next song" > ↷ </button>
+                    <div class="mountain mountain-back"></div>
 
-</div>
+                    <div class="mountain mountain-front"></div>
 
-<!-- Favorite -->
 
-<button type="button" class="heart-btn" id="currentFavorite" title="Add to favorites" aria-label="Add current song to favorites" > ♡ </button>
+                    <div class="hero-character">
+                        ♪
+                    </div>
 
-</div>
+                </div>
 
-<!-- ================================================= ADVANCED PLAYER BAR ================================================== -->
+            </section>
 
-<div class="player-extra">
 
-<div class="progress-area">
 
-<span id="currentTime" class="time" > 0:00 </span>
+            <!-- =========================
+                 PLAYER
+            ========================== -->
 
-<input type="range" id="progressBar" min="0" max="100" value="0" step="0.1" aria-label="Song progress" >
+            <section
+                class="player-card"
+                aria-label="Music player"
+            >
 
-<span id="durationTime" class="time" > 0:00 </span>
 
-</div>
+                <!-- YouTube player -->
 
-<div class="extra-controls">
+                <div class="player-video">
 
-<!-- Volume -->
+                    <div
+                        id="youtube-player"
+                    ></div>
 
-<button type="button" id="muteButton" title="Mute" aria-label="Mute or unmute" > 🔊 </button>
+                </div>
 
-<input type="range" id="volumeSlider" min="0" max="100" value="100" step="1" aria-label="Volume" >
 
-<!-- Repeat -->
+                <!-- Player Information -->
 
-<button type="button" id="repeatButton" class="player-option" title="Repeat off" aria-label="Toggle repeat" > ↻ </button>
+                <div class="player-info">
 
-<!-- Queue -->
+                    <div class="now-playing">
 
-<button type="button" id="queueButton" class="player-option" title="Open queue" aria-label="Open queue" > ☷ </button>
+                        <span>
+                            NOW PLAYING
+                        </span>
 
-</div>
 
-</div>
+                        <h2 id="playingTitle">
+                            The Less I Know The Better
+                        </h2>
 
-</section>
 
-<!-- ================================================= PLAYLIST ================================================== -->
+                        <span id="playingArtist">
+                            Tame Impala
+                        </span>
 
-<section class="music-section" aria-label="Playlist" >
+                    </div>
 
-<div class="section-heading">
 
-<div>
+                    <!-- Controls -->
 
-<span class="small-heading"> YOUR MIX </span>
+                    <div class="player-controls">
 
-<h2 id="playlistTitle"> Tonight's selection </h2>
+                        <button
+                            type="button"
+                            onclick="previousSong()"
+                            aria-label="Previous song"
+                            title="Previous"
+                        >
+                            ‹‹
+                        </button>
 
-</div>
 
-<div class="playlist-actions">
+                        <button
+                            type="button"
+                            class="main-play"
+                            id="playButton"
+                            onclick="togglePlay()"
+                            aria-label="Play or pause"
+                            title="Play / Pause"
+                        >
+                            ▶
+                        </button>
 
-<button type="button" class="shuffle-btn" id="shuffleButton" > ⤨ <span>Shuffle</span> </button>
 
-</div>
+                        <button
+                            type="button"
+                            onclick="nextSong()"
+                            aria-label="Next song"
+                            title="Next"
+                        >
+                            ››
+                        </button>
 
-</div>
 
-<!-- Song list -->
+                        <button
+                            type="button"
+                            class="heart-btn"
+                            id="currentFavorite"
+                            onclick="toggleCurrentFavorite()"
+                            aria-label="Add to favorites"
+                            title="Favorite"
+                        >
+                            ♡
+                        </button>
 
-<div id="songList" class="song-list" aria-live="polite" ></div>
+                    </div>
 
-</section>
+                </div>
 
-</section>
+            </section>
 
-</main>
 
-<!-- ===================================================== QUEUE DRAWER ====================================================== -->
 
-<aside class="queue-panel" id="queuePanel" aria-label="Playback queue" aria-hidden="true"
+            <!-- =========================
+                 MUSIC LIST
+            ========================== -->
 
-<div class="queue-header">
+            <section
+                class="music-section"
+                id="musicSection"
+            >
 
-<div> <span class="small-heading"> UP NEXT </span>
+                <div class="section-heading">
 
-<h2>Queue</h2> </div>
+                    <div>
 
-<button type="button" id="closeQueueButton" aria-label="Close queue" > × </button>
+                        <div class="small-heading">
+                            YOUR COLLECTION
+                        </div>
 
-</div>
+                        <h2 id="playlistTitle">
+                            Your Playlist
+                        </h2>
 
-<div id="queueList" class="queue-list" ></div>
+                    </div>
 
-</aside>
 
-<!-- Queue overlay -->
+                    <button
+                        type="button"
+                        class="shuffle-btn"
+                        onclick="shufflePlaylist()"
+                    >
+                        ⤨ Shuffle
+                    </button>
 
-<div class="queue-overlay" id="queueOverlay" hidden
+                </div>
 
-</div>
-<!-- ===================================================== MOBILE PLAYER ====================================================== -->
 
-<div class="mobile-player" id="mobilePlayer"
+                <!-- Playlist -->
 
-<div class="mobile-song">
+                <div
+                    class="song-list"
+                    id="songList"
+                >
+                    <!-- Songs generated by JavaScript -->
+                </div>
 
-<div class="mobile-cover" id="mobileCover" > ♫ </div>
+            </section>
 
-<div class="mobile-song-info">
+        </main>
 
-<strong id="mobileTitle"> Nothing playing </strong>
+    </div>
 
-<small id="mobileArtist"> Choose a song </small>
 
-</div>
 
-</div>
+    <!-- =========================
+         MOBILE PLAYER
+    ========================== -->
 
-<button type="button" id="mobilePlay" aria-label="Play or pause" > ▶ </button>
+    <div
+        class="mobile-player"
+        id="mobilePlayer"
+    >
 
-<button type="button" id="mobileNext" aria-label="Next song" > ↷ </button>
+        <div class="mobile-song">
 
-</div>
+            <div
+                class="mobile-cover"
+                id="mobileCover"
+            >
+                ♪
+            </div>
 
-<!-- ===================================================== SLEEP TIMER ====================================================== -->
 
-<div class="sleep-timer" id="sleepTimer" hidden
+            <div>
 
-<button type="button" id="sleepTimerButton" aria-label="Sleep timer" > ◷ </button>
+                <strong id="mobileTitle">
+                    The Less I Know The Better
+                </strong>
 
-<div class="sleep-menu" id="sleepMenu">
+                <small id="mobileArtist">
+                    Tame Impala
+                </small>
 
-<strong>Sleep timer</strong>
+            </div>
 
-<button type="button" data-sleep="15" > 15 minutes </button>
+        </div>
 
-<button type="button" data-sleep="30" > 30 minutes </button>
 
-<button type="button" data-sleep="60" > 1 hour </button>
+        <button
+            type="button"
+            onclick="previousSong()"
+            aria-label="Previous song"
+        >
+            ‹
+        </button>
 
-<button type="button" data-sleep="off" > Turn off </button>
 
-</div>
+        <button
+            type="button"
+            id="mobilePlay"
+            onclick="togglePlay()"
+            aria-label="Play or pause"
+        >
+            ▶
+        </button>
 
-</div>
 
-<!-- ===================================================== TOAST NOTIFICATIONS ====================================================== -->
+        <button
+            type="button"
+            onclick="nextSong()"
+            aria-label="Next song"
+        >
+            ›
+        </button>
 
-<div id="toast" class="toast" role="status" aria-live="polite"
+    </div>
 
-</div>
-<!-- ===================================================== YOUTUBE IFRAME API
 
-Keep this BEFORE script.js. ====================================================== -->
 
-<script src="https://www.youtube.com/iframe_api"
+    <!-- =========================
+         YOUTUBE IFRAME API
+    ========================== -->
 
-</script>
-<!-- ===================================================== APPLICATION JAVASCRIPT ====================================================== -->
+    <script src="https://www.youtube.com/iframe_api"></script>
 
-<script src="script.js"></script>
 
-</body> </html> :::
+    <!-- =========================
+         YOUR JAVASCRIPT
+    ========================== -->
+
+    <script src="script.js"></script>
+
+
+    <!-- =========================
+         SMALL HTML SAFETY / UI
+    ========================== -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const searchInput =
+                    document.getElementById(
+                        "searchInput"
+                    );
+
+                const clearSearch =
+                    document.getElementById(
+                        "clearSearch"
+                    );
+
+                const mobileMenu =
+                    document.getElementById(
+                        "mobileMenu"
+                    );
+
+
+                /* Search */
+
+                if (searchInput) {
+
+                    searchInput.addEventListener(
+                        "input",
+                        function () {
+
+                            if (typeof searchSongs === "function") {
+                                searchSongs();
+                            }
+
+                            if (clearSearch) {
+
+                                clearSearch.style.display =
+                                    this.value
+                                        ? "block"
+                                        : "none";
+
+                            }
+
+                        }
+                    );
+
+
+                    searchInput.addEventListener(
+                        "keydown",
+                        function (event) {
+
+                            if (
+                                event.key ===
+                                "Escape"
+                            ) {
+
+                                this.value = "";
+
+                                if (
+                                    typeof searchSongs ===
+                                    "function"
+                                ) {
+                                    searchSongs();
+                                }
+
+                                if (clearSearch) {
+                                    clearSearch.style.display =
+                                        "none";
+                                }
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                /* Clear search */
+
+                if (clearSearch) {
+
+                    clearSearch.addEventListener(
+                        "click",
+                        function () {
+
+                            searchInput.value = "";
+
+                            searchInput.focus();
+
+                            if (
+                                typeof searchSongs ===
+                                "function"
+                            ) {
+                                searchSongs();
+                            }
+
+                            clearSearch.style.display =
+                                "none";
+
+                        }
+                    );
+
+                }
+
+
+                /* Sidebar */
+
+                const overlay =
+                    document.getElementById(
+                        "sidebarOverlay"
+                    );
+
+
+                if (overlay) {
+
+                    overlay.addEventListener(
+                        "click",
+                        function () {
+
+                            if (
+                                typeof closeSidebar ===
+                                "function"
+                            ) {
+                                closeSidebar();
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                /* Escape closes sidebar */
+
+                document.addEventListener(
+                    "keydown",
+                    function (event) {
+
+                        if (
+                            event.key === "Escape"
+                        ) {
+
+                            if (
+                                typeof closeSidebar ===
+                                "function"
+                            ) {
+                                closeSidebar();
+                            }
+
+                        }
+
+                    }
+                );
+
+
+                /* Close drawer after navigation */
+
+                document.addEventListener(
+                    "click",
+                    function (event) {
+
+                        const item =
+                            event.target.closest(
+                                ".nav-item, .mood-btn"
+                            );
+
+                        if (!item) return;
+
+                        if (
+                            window.innerWidth <= 700
+                        ) {
+
+                            if (
+                                typeof closeSidebar ===
+                                "function"
+                            ) {
+                                closeSidebar();
+                            }
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =====================================
+           OPTIONAL NAVIGATION HELPERS
+        ===================================== */
+
+        function showHome() {
+
+            document
+                .querySelectorAll(".nav-item")
+                .forEach(item => {
+                    item.classList.remove("active");
+                });
+
+
+            const home =
+                document.querySelector(
+                    '[data-nav="home"]'
+                );
+
+
+            if (home) {
+                home.classList.add("active");
+            }
+
+
+            const title =
+                document.getElementById(
+                    "playlistTitle"
+                );
+
+
+            if (title) {
+                title.textContent =
+                    "Your Playlist";
+            }
+
+
+            if (
+                typeof searchSongs ===
+                "function"
+            ) {
+
+                const input =
+                    document.getElementById(
+                        "searchInput"
+                    );
+
+                if (input) {
+                    input.value = "";
+                }
+
+                filteredSongs = [...songs];
+
+                renderSongs(filteredSongs);
+
+            }
+
+        }
+
+
+        function showDiscover() {
+
+            document
+                .querySelectorAll(".nav-item")
+                .forEach(item => {
+                    item.classList.remove("active");
+                });
+
+
+            const discover =
+                document.querySelector(
+                    '[data-nav="discover"]'
+                );
+
+
+            if (discover) {
+                discover.classList.add("active");
+            }
+
+
+            const title =
+                document.getElementById(
+                    "playlistTitle"
+                );
+
+
+            if (title) {
+                title.textContent =
+                    "Discover";
+            }
+
+
+            filteredSongs =
+                [...songs];
+
+
+            renderSongs(filteredSongs);
+
+        }
+
+    </script>
+
+</body>
+
+</html>
+:::
